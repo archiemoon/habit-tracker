@@ -159,7 +159,7 @@ document.body.addEventListener("touchend", e => {
     }
 });
 
-// ------------------ INIT ------------------
+// ------------------ INIT -----------------
 
 loadData();
 render();
