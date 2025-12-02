@@ -190,4 +190,37 @@ document.getElementById("next-day").addEventListener("click", () => {
     }
 });
 
+let touchStartX = 0;
+
+document.addEventListener('touchstart', (e) => {
+touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', (e) => {
+const touchEndX = e.changedTouches[0].screenX;
+const diff = touchEndX - touchStartX;
+
+  if (Math.abs(diff) > 50) { // threshold
+    if (diff > 0) {
+      // swipe right → previous day
+    currentDate.setDate(currentDate.getDate() - 1);
+    renderDailyView();
+    } else {
+      // swipe left → next day
+    const today = new Date();
+    const current = new Date(currentDate.getFullYear(), currentDate.getMonth(),
+
+    currentDate.getDate());
+
+    const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    if (current < now) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        renderDailyView();
+    }
+    }
+}
+});
+
+
 renderDailyView();
