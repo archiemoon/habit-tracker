@@ -95,7 +95,8 @@ toggleBtn.addEventListener("click", () => {
     panelOpen = !panelOpen;
 
     if (panelOpen) {
-        toggleBtn.textContent = "–";
+        toggleBtn.textContent = "−";
+        confirmAdd.textContent = "✓";
         input.style.display = "block";
         confirmAdd.style.display = "block";
         input.focus();
