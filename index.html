@@ -1,32 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Habit Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div id="daily-view" class="view">
+    <div id="app">
 
-    <!-- Date Controls -->
-    <div class="date-nav">
-      <button id="prev-day">&lt;</button>
-      <span id="date-display"></span>
-      <button id="next-day">&gt;</button>
+        <!-- Date Bar -->
+        <div id="date-bar">
+            <button id="prev-day">&#8592;</button>
+            <span id="date-text">Today</span>
+            <button id="next-day">&#8594;</button>
+        </div>
+
+        <!-- Habit List -->
+        <div id="habit-list"></div>
+
+        <!-- Bottom Controls -->
+        <div id="bottom-bar">
+
+            <!-- Toggle button -->
+            <button id="add-toggle">+</button>
+
+            <!-- Input -->
+            <input type="text" id="new-habit-input" placeholder="New habit...">
+
+            <!-- Tick -->
+            <button id="confirm-add">✔</button>
+
+        </div>
+
     </div>
 
-    <!-- Habits List -->
-    <div id="habits-list"></div>
-
-    <!-- Add Habit -->
-    <div class="add-habit">
-      <input type="text" id="new-habit-name" placeholder="New Habit">
-      <button id="add-habit-btn">Add</button>
-    </div>
-
-  </div>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

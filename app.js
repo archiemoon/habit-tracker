@@ -1,226 +1,165 @@
-///
-// DATA SYSTEM
-///
+// ------------------ DATA ------------------
+
+let habits = [];
+let tracking = {};
+
+function saveData() {
+    localStorage.setItem("habits", JSON.stringify(habits));
+    localStorage.setItem("tracking", JSON.stringify(tracking));
+}
 
 function loadData() {
-    const saved = localStorage.getItem("habitData");
-    if (saved) {
-        return JSON.parse(saved);
-    }
-    return { habits: [], tracking: {} };
+    habits = JSON.parse(localStorage.getItem("habits")) || [];
+    tracking = JSON.parse(localStorage.getItem("tracking")) || {};
 }
 
-function saveData(data) {
-    localStorage.setItem("habitData", JSON.stringify(data));
-}
+// ------------------ DATE HANDLING ------------------
 
-function addHabit(name) {
-    const data = loadData();
+let viewingDate = new Date();
+let today = new Date();
 
-    const newHabit = {
-        id: Date.now(),
-        name: name
-    };
+function formatDate(d) {
+    let dow = d.toLocaleDateString("en-GB", { weekday: "short" });
+    let day = d.getDate();
+    let month = d.toLocaleDateString("en-GB", { month: "short" });
 
-    data.habits.push(newHabit);
-    saveData(data);
-
-    return newHabit;
-}
-
-function removeHabit(id) {
-    const data = loadData();
-
-    data.habits = data.habits.filter(h => h.id !== id);
-
-    for (const date in data.tracking) {
-        delete data.tracking[date][id];
-    }
-
-    saveData(data);
-}
-
-function toggleHabit(habitId, date) {
-    const data = loadData();
-
-    if (!data.tracking[date]) {
-        data.tracking[date] = {};
-    }
-
-    const current = data.tracking[date][habitId];
-    data.tracking[date][habitId] = !current;
-
-    saveData(data);
-}
-
-function getTrackingForDate(date) {
-    const data = loadData();
-    return data.tracking[date] || {};
-}
-
-
-///
-// Logic
-///
-
-let currentDate = new Date();
-
-function formatDate(date) {
-    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-    const dayName = days[date.getDay()];
-    const dayNum = date.getDate();
-    const monthName = months[date.getMonth()];
-
-    // Add suffix: 1st, 2nd, 3rd, 4th...
     let suffix = "th";
-    if (dayNum % 10 === 1 && dayNum !== 11) suffix = "st";
-    else if (dayNum % 10 === 2 && dayNum !== 12) suffix = "nd";
-    else if (dayNum % 10 === 3 && dayNum !== 13) suffix = "rd";
+    if (day % 10 === 1 && day !== 11) suffix = "st";
+    else if (day % 10 === 2 && day !== 12) suffix = "nd";
+    else if (day % 10 === 3 && day !== 13) suffix = "rd";
 
-    return `${dayName} ${dayNum}${suffix} ${monthName}`;
+    return `${dow} ${day}${suffix} ${month}`;
 }
 
-
-function getDateLabel(date) {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
-
-    if (
-        date.getFullYear() === today.getFullYear() &&
-        date.getMonth() === today.getMonth() &&
-        date.getDate() === today.getDate()
-    ) return "Today";
-
-    if (
-        date.getFullYear() === yesterday.getFullYear() &&
-        date.getMonth() === yesterday.getMonth() &&
-        date.getDate() === yesterday.getDate()
-    ) return "Yesterday";
-
-    // fallback to formatted date
-    return formatDate(date);
+function isSameDay(a, b) {
+    return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+    );
 }
 
+function canGoForward() {
+    return viewingDate < today;
+}
 
-function updateNavButtons() {
-    const nextBtn = document.getElementById("next-day");
+// ------------------ RENDER ------------------
 
-    // Enable by default
-    nextBtn.disabled = false;
+function render() {
+    const dateText = document.getElementById("date-text");
 
-    // Disable only if currentDate is today or after today
-    const today = new Date();
-    // Remove time portion for comparison
-    const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-    const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    if (current >= now) {
-        nextBtn.disabled = true;
+    if (isSameDay(viewingDate, today)) {
+        dateText.textContent = "Today";
+    } else {
+        dateText.textContent = formatDate(viewingDate);
     }
+
+    renderHabits();
 }
 
+function renderHabits() {
+    const list = document.getElementById("habit-list");
+    list.innerHTML = "";
 
-function renderDailyView() {
-    const data = loadData();
-    
-    const dateDisplay = document.getElementById("date-display");
-    const dateStr = formatDate(currentDate); // FIXED
+    let dateKey = viewingDate.toISOString().split("T")[0];
+    if (!tracking[dateKey]) tracking[dateKey] = [];
 
-    dateDisplay.textContent = getDateLabel(currentDate);
+    habits.forEach(h => {
+        const div = document.createElement("div");
+        div.className = "habit";
 
-    const habitListDiv = document.getElementById("habits-list");
-    habitListDiv.innerHTML = ""; // FIXED name to match HTML
+        div.innerHTML = `
+            <span>${h}</span>
+            <button data-habit="${h}">X</button>
+        `;
 
-    const habits = data.habits;
-    const tracking = data.tracking[dateStr] || {}; // FIXED
-
-    habits.forEach(habit => {
-        const habitDiv = document.createElement("div");
-        habitDiv.className = "habit-item";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = tracking[habit.id] || false;
-
-        checkbox.addEventListener("change", () => {
-            toggleHabit(habit.id, dateStr);
-            renderDailyView();
+        div.querySelector("button").addEventListener("click", () => {
+            habits = habits.filter(x => x !== h);
+            saveData();
+            render();
         });
 
-        const label = document.createElement("span");
-        label.textContent = habit.name;
-
-        habitDiv.appendChild(checkbox);
-        habitDiv.appendChild(label);
-
-        habitListDiv.appendChild(habitDiv);
+        list.appendChild(div);
     });
-    updateNavButtons();
 }
 
-document.getElementById("add-habit-btn").addEventListener("click", () => {
-    const nameInput = document.getElementById("new-habit-name");
-    const name = nameInput.value.trim();
+// ------------------ BOTTOM BAR UI ------------------
 
-    if (name !== "") {
-        addHabit(name);
-        nameInput.value = "";
-        renderDailyView();
+const toggleBtn = document.getElementById("add-toggle");
+const input = document.getElementById("new-habit-input");
+const confirmAdd = document.getElementById("confirm-add");
+
+let panelOpen = false;
+
+toggleBtn.addEventListener("click", () => {
+    panelOpen = !panelOpen;
+
+    if (panelOpen) {
+        toggleBtn.textContent = "–";
+        input.style.display = "block";
+        confirmAdd.style.display = "block";
+        input.focus();
+    } else {
+        toggleBtn.textContent = "+";
+        input.style.display = "none";
+        confirmAdd.style.display = "none";
     }
 });
 
+confirmAdd.addEventListener("click", () => {
+    const text = input.value.trim();
+    if (text.length === 0) return;
+
+    habits.push(text);
+    input.value = "";
+
+    saveData();
+    render();
+
+    // Hide UI
+    panelOpen = false;
+    toggleBtn.textContent = "+";
+    input.style.display = "none";
+    confirmAdd.style.display = "none";
+});
+
+// ------------------ DAY NAVIGATION ------------------
+
 document.getElementById("prev-day").addEventListener("click", () => {
-    currentDate.setDate(currentDate.getDate() - 1);
-    renderDailyView();
+    viewingDate.setDate(viewingDate.getDate() - 1);
+    render();
 });
 
 document.getElementById("next-day").addEventListener("click", () => {
-    const today = new Date();
-    const current = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-    const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (!canGoForward()) return;
+    viewingDate.setDate(viewingDate.getDate() + 1);
+    render();
+});
 
-    if (current < now) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        renderDailyView();
+// ------------------ SWIPE ------------------
+
+let startX = 0;
+
+document.body.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+});
+
+document.body.addEventListener("touchend", e => {
+    let endX = e.changedTouches[0].clientX;
+    let diff = endX - startX;
+
+    if (Math.abs(diff) < 60) return;
+
+    if (diff < 0 && canGoForward()) {
+        viewingDate.setDate(viewingDate.getDate() + 1);
+        render();
+    } else if (diff > 0) {
+        viewingDate.setDate(viewingDate.getDate() - 1);
+        render();
     }
 });
 
-let touchStartX = 0;
+// ------------------ INIT ------------------
 
-document.addEventListener('touchstart', (e) => {
-touchStartX = e.changedTouches[0].screenX;
-});
-
-document.addEventListener('touchend', (e) => {
-const touchEndX = e.changedTouches[0].screenX;
-const diff = touchEndX - touchStartX;
-
-  if (Math.abs(diff) > 50) { // threshold
-    if (diff > 0) {
-      // swipe right → previous day
-    currentDate.setDate(currentDate.getDate() - 1);
-    renderDailyView();
-    } else {
-      // swipe left → next day
-    const today = new Date();
-    const current = new Date(currentDate.getFullYear(), currentDate.getMonth(),
-
-    currentDate.getDate());
-
-    const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    if (current < now) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        renderDailyView();
-    }
-    }
-}
-});
-
-
-renderDailyView();
+loadData();
+render();
