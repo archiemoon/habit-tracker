@@ -4,7 +4,6 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: #f2f2f2;
     font-family: sans-serif;
 }
 
@@ -12,6 +11,7 @@ html, body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background: transparent; /* allow background to show through */
 }
 
 /* ---------- DATE BAR ---------- */
@@ -73,15 +73,11 @@ html, body {
     display: flex;
     align-items: center;
     gap: 10px;
-
-    /* Blends into page */
-    background: #f2f2f2;
-
+    background: transparent; /* blend into page */
     padding: 15px;
     border-top: 1px solid #ddd;
 }
 
-/* Add (+) / Remove (–) toggle button */
 #add-toggle {
     background: #1e90ff;
     color: white;
@@ -95,7 +91,6 @@ html, body {
     line-height: 0;
 }
 
-/* Input box (hidden by default) */
 #new-habit-input {
     flex: 1;
     padding: 12px;
@@ -105,7 +100,6 @@ html, body {
     display: none;
 }
 
-/* Tick buton (hidden by default) */
 #confirm-add {
     background: #10cf16;
     color: white;
@@ -118,12 +112,13 @@ html, body {
     display: none;
 }
 
+/* ---------- BACKGROUND ---------- */
 #bg {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
-    z-index: -10; /* put behind everything */
+    z-index: -10;
     overflow: hidden;
 }
 

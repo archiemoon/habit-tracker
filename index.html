@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Habit Tracker</title>
-    <link rel="stylesheet" href="style.css?v=1.1.3">
+    <link rel="stylesheet" href="style.css?v=1.1.4">
 </head>
 <body>
+    <!-- Animated Background -->
     <div id="bg"></div>
 
+    <!-- Main App -->
     <div id="app">
 
-        <!-- DateBar -->
+        <!-- Date Bar -->
         <div id="date-bar">
             <button id="prev-day">&#8592;</button>
             <span id="date-text">Today</span>
@@ -23,26 +25,16 @@
 
         <!-- Bottom Controls -->
         <div id="bottom-bar">
-
-            <!-- Toggle button -->
             <button id="add-toggle">+</button>
-
-            <!-- Input -->
             <input type="text" id="new-habit-input" placeholder="New habit...">
-
-            <!-- Tick -->
             <button id="confirm-add">✔</button>
-
         </div>
 
     </div>
 
-
-<script type="module" src="https://cdn.jsdelivr.net/npm/ogl@1.0.0/dist/ogl.min.js"></script>
-<script type="module" src="background.js"></script>
-<script src="app.js"></script>
-<script src="background.js"></script>
-
-<script src="app.js?v=1.1.3"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/ogl@1.0.0/dist/ogl.min.js"></script>
+    <script src="background.js"></script>
+    <script src="app.js?v=1.1.4"></script>
 </body>
 </html>
