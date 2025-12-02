@@ -6,8 +6,25 @@
 </head>
 <body>
 
-  <h1>Habit Tracker</h1>
-  <p>Stage 2 engine loaded.</p>
+  <div id="daily-view" class="view">
+
+    <!-- Date Controls -->
+    <div class="date-nav">
+      <button id="prev-day">&lt;</button>
+      <span id="date-display"></span>
+      <button id="next-day">&gt;</button>
+    </div>
+
+    <!-- Habits List -->
+    <div id="habits-list"></div>
+
+    <!-- Add Habit -->
+    <div class="add-habit">
+      <input type="text" id="new-habit-name" placeholder="New Habit">
+      <button id="add-habit-btn">Add</button>
+    </div>
+
+  </div>
 
   <script src="app.js"></script>
 </body>

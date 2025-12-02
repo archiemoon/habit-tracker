@@ -1,1 +1,30 @@
-
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  .date-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  
+  #habit-list {
+    margin-bottom: 20px;
+  }
+  
+  .habit-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .add-habit {
+    display: flex;
+    gap: 10px;
+  }
+  
