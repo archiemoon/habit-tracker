@@ -46,12 +46,13 @@ html, body {
 }
 
 .habit {
+    color: white;
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 12px;
     display: flex;
     justify-content: space-between;
-    font-size: 18px;
+    font-size: 19px;
 }
 
 .habit button {
