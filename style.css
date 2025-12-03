@@ -157,12 +157,12 @@ canvas {
 /* bottom bar */
 #bottom-bar {
     position: fixed;
-    bottom: 15px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
-    padding: 2px 2px;
+    padding: 10px 10px;
     border-radius: 25px;
     background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
@@ -186,7 +186,7 @@ canvas {
 .add-btn {
     border:none;
     padding:2px 15px;
-    border-radius:50px;
+    border-radius:25px;
     background: rgba(255, 255, 255, 0.12);
     color:white;
     font-weight:400;
@@ -282,7 +282,7 @@ canvas {
 /* VIEW SWITCHER PILL BUTTONS */
 #view-switcher {
     position: fixed;
-    bottom: 66px; /* above bottom bar */
+    bottom: 95px; /* above bottom bar */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
