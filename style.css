@@ -1,149 +1,185 @@
-/* Prevent scrolling & set base layout */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    font-family: sans-serif;
+/* Reset & base */
+:root {
+    --glass-bg: rgba(255,255,255,0.12);
+    --glass-border: rgba(255,255,255,0.18);
+    --accent: #60a5fa;
+    --danger: #ff6666;
+    --card-radius: 12px;
 }
+* { box-sizing: border-box; }
+html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: transparent; overflow:hidden; }
 
+/* App layout */
 #app {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: transparent; /* allow background to show through */
-}
-
-/* ---------- DATE BAR ---------- */
-#date-bar {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 20px;
-    border-bottom: 1px solid #ddd;
-}
-
-#date-bar button {
-    color : white;
-    background: none;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-}
-
-#date-text {
-    color : white;
-    min-width: 170px;
-    text-align: center;
-}
-
-/* ---------- HABIT LIST ---------- */
-#habit-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-}
-
-.habit {
-    color: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 19px;
-}
-
-.habit button {
-    background: red;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    text-align: center;
-    line-height: 0;
-}
-
-/* ---------- BOTTOM BAR ---------- */
-#bottom-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: transparent; /* blend into page */
-    padding: 15px;
-    border-top: 1px solid #ddd;
-}
-
-#add-toggle {
-color: white;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    border: none;
-    font-size: 40px;
-    cursor: pointer;
-    text-align: center;
-    line-height: 0;
-}
-
-#new-habit-input {
-    flex: 1;
+    height:100vh;
+    width:100vw;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
     padding: 12px;
-    font-size: 18px;
-    border-radius: 10px;
-    border: 1px solid #bbb;
-    display: none;
+    position:relative;
+    z-index:10;
 }
 
-#confirm-add {
-    color: white;
-    border: none;
-    width: 55px;
-    height: 55px;
-    font-size: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: none;
-}
-
-/* ---------- BACKGROUND ---------- */
 #bg {
     position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: -10;
-    overflow: hidden;
+    pointer-events: none;
 }
-
 canvas {
     display: block;
+    width: 100vw !important;
+    height: 100vh !important;
 }
 
+
+/* Date bar */
+#date-bar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.left-controls, .right-controls { display:flex; align-items:center; gap:8px; }
+#center-controls { display:flex; flex-direction:column; align-items:center; gap:6px; }
+#date-text { color:white; font-weight:600; font-size:18px; min-width:160px; text-align:center; }
+
+/* Mode buttons */
+.mode-btn {
+    border:none;
+    padding:6px 8px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.06);
+    color: white;
+    cursor:pointer;
+    font-size:12px;
+}
+.mode-btn.active { background: rgba(255,255,255,0.16); transform:translateY(-1px); }
+
+/* top-panels */
+#top-panels { display:flex; gap:12px; }
+.panel { flex:1; padding:10px; min-height:64px; border-radius:var(--card-radius); border:1px solid var(--glass-border); background:var(--glass-bg); color:white; }
+.panel-title { font-size:13px; opacity:0.9; margin-bottom:8px; }
+
+/* habit list */
+#habit-list {
+    flex:1;
+    overflow:auto;
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+/* habit card */
+.habit {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px;
+    border-radius:12px;
+    color:white;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    transition: transform 180ms ease, opacity 180ms ease;
+    transform-origin:left center;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.habit .left {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.habit .color-swatch {
+    width:14px;
+    height:14px;
+    border-radius:4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.habit .habit-name { font-size:16px; font-weight:600; }
+.habit .habit-meta { font-size:12px; opacity:0.85; }
+
+.habit .actions {
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+.action {
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    border:none;
+    background: rgba(255,255,255,0.06);
+    cursor:pointer;
+    display:grid;
+    place-items:center;
+    font-size:16px;
+}
+
+/* completed style */
+.habit.done { transform: translateX(6px); opacity:0.85; }
+.habit .habit-name.done { text-decoration: line-through; opacity:0.8; }
+
+/* bottom bar */
+#bottom-bar {
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
 .glass {
-    width: 10rem;
-    height: 4rem;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    cursor: pointer;
-    font-size: 1rem;
-    color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: 0.3s;
+    background: rgba(255,255,255,0.12);
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.18);
+    padding:8px;
+}
+.action-btn {
+    width:56px;
+    height:56px;
+    display:grid;
+    place-items:center;
+    font-size:26px;
+    border-radius:50%;
+    cursor:pointer;
+}
+.small { padding:8px 10px; font-size:13px; border-radius:10px; cursor:pointer; }
+.nav-btn { width:46px; height:46px; font-size:20px; }
+
+/* add panel */
+.add-panel { display:flex; gap:8px; align-items:center; flex:1; }
+#new-habit-input { flex:1; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:white; font-size:15px; display:block; }
+#new-habit-color { width:48px; height:40px; border-radius:8px; border:none; }
+
+/* glass-panel for panels/modals */
+.glass-panel {
+    background: rgba(255,255,255,0.06);
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.14);
+    padding:12px;
 }
 
-.glass:hover {
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 6px 40px rgba(0, 0, 0, 0.15);
+/* modal */
+.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50; }
+.modal.hidden { display:none; }
+.modal-inner { width:320px; max-width:90%; }
+.modal input { width:100%; padding:8px; margin:6px 0; border-radius:8px; border:1px solid rgba(0,0,0,0.1); }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+.danger { background: linear-gradient(180deg,var(--danger),#d94e4e); color:white; }
+
+/* utility */
+.hidden { display:none; }
+.panel-title { font-weight:600; }
+
+/* make scrollbar unobtrusive */
+#habit-list::-webkit-scrollbar { width:10px; height:10px; }
+#habit-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius:10px; }
+
+/* responsive */
+@media (max-width:720px) {
+    #top-panels { flex-direction:column; }
+    .left-controls, .right-controls { display:none; }
+    #center-controls { width:100%; }
 }

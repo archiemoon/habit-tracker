@@ -82,9 +82,13 @@ const program = new Program(gl, {
 const mesh = new Mesh(gl, { geometry, program });
 
 function resize() {
-  renderer.setSize(container.offsetWidth, container.offsetHeight);
-  program.uniforms.uResolution.value = new Float32Array([gl.canvas.width, gl.canvas.height]);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    renderer.setSize(w, h);
+    program.uniforms.uResolution.value = new Float32Array([w, h]);
 }
+
 
 window.addEventListener("resize", resize);
 resize();

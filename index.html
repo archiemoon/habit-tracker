@@ -1,37 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>Habit Tracker</title>
-<link rel="stylesheet" href="style.css?v=1.1.6">
+
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="style.css?v=2.0.0">
+
+<!-- A small inline script to register service worker as early as possible -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(console.error);
+  });
+}
+</script>
 </head>
 <body>
     <!-- Animated Background -->
     <div id="bg"></div>
 
     <!-- Main App -->
-    <div id="app">
+    <div id="app" role="application" aria-label="Habit Tracker App">
 
-        <!-- Date Bar -->
+        <!-- Header / Date Bar -->
         <div id="date-bar">
-            <button id="prev-day" class="glass">&#8592;</button>
-            <span id="date-text">Today</span>
-            <button id="next-day" class="glass">&#8594;</button>
+            <div class="left-controls">
+                <button id="prev-day" class="glass nav-btn" title="Previous day">←</button>
+            </div>
+
+            <div id="center-controls">
+                <span id="date-text">Today</span>
+                <div id="view-mode">
+                    <button id="mode-daily" class="mode-btn active">Daily</button>
+                    <button id="mode-weekly" class="mode-btn">Weekly</button>
+                    <button id="mode-monthly" class="mode-btn">Monthly</button>
+                </div>
+            </div>
+
+            <div class="right-controls">
+                <button id="next-day" class="glass nav-btn" title="Next day">→</button>
+            </div>
         </div>
 
-        <!-- Habit List -->
-        <div id="habit-list"></div>
+        <!-- Top panels: streaks / overview -->
+        <div id="top-panels">
+            <div id="streaks-panel" class="panel glass-panel">
+                <div class="panel-title">Top Streaks</div>
+                <div id="streaks-list"></div>
+            </div>
+
+            <div id="overview-panel" class="panel glass-panel">
+                <div class="panel-title">Overview</div>
+                <div id="overview-content"></div>
+            </div>
+        </div>
+
+        <!-- Habit List / Grid -->
+        <div id="habit-list" aria-live="polite"></div>
 
         <!-- Bottom Controls -->
         <div id="bottom-bar">
-            <button id="add-toggle" class="glass">+</button>
-            <input type="text" id="new-habit-input" placeholder="New habit...">
-            <button id="confirm-add" class="glass">✔</button>
+            <button id="add-toggle" class="glass action-btn">+</button>
+
+            <div id="add-panel" class="add-panel">
+                <input type="text" id="new-habit-input" placeholder="New habit..." maxlength="80" />
+                <input type="color" id="new-habit-color" value="#60a5fa" title="Pick color">
+                <button id="confirm-add" class="glass action-btn">✔</button>
+            </div>
+
+            <div id="export-panel">
+                <button id="export-data" class="glass small">Export</button>
+                <button id="import-data" class="glass small">Import</button>
+                <input type="file" id="import-file" accept="application/json" style="display:none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-inner glass-panel">
+            <h3>Edit habit</h3>
+            <input id="edit-name" type="text" maxlength="80" />
+            <input id="edit-color" type="color" />
+            <div class="modal-actions">
+                <button id="save-edit" class="glass action-btn">Save</button>
+                <button id="cancel-edit" class="glass action-btn">Cancel</button>
+                <button id="delete-habit" class="glass danger">Delete</button>
+            </div>
         </div>
     </div>
 
 <script type="module" src="background.js"></script>
-<script src="app.js?v=1.1.6"></script>
+<script src="app.js?v=2.0.0"></script>
 </body>
 </html>
