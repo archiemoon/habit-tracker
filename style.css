@@ -16,7 +16,6 @@ html, body {
 
 /* ---------- DATE BAR ---------- */
 #date-bar {
-    background: white;
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -25,6 +24,7 @@ html, body {
 }
 
 #date-bar button {
+    color : white;
     background: none;
     border: none;
     font-size: 28px;
@@ -34,6 +34,7 @@ html, body {
 }
 
 #date-text {
+    color : white;
     min-width: 170px;
     text-align: center;
 }
