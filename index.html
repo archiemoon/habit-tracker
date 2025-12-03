@@ -6,9 +6,9 @@
 <title>Habit Tracker</title>
 
 <link rel="manifest" href="manifest.json" />
-<link rel="stylesheet" href="style.css?v=2.0.0">
+<link rel="stylesheet" href="style.css?v=3.0.0">
 
-<!-- A small inline script to register service worker as early as possible -->
+<!-- Register service worker early -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -44,21 +44,31 @@ if ('serviceWorker' in navigator) {
             </div>
         </div>
 
-        <!-- Top panels: streaks / overview -->
-        <div id="top-panels">
-            <div id="streaks-panel" class="panel glass-panel">
-                <div class="panel-title">Top Streaks</div>
-                <div id="streaks-list"></div>
-            </div>
+        <!-- HABITS VIEW -->
+        <div id="habits-page">
+            <div id="habit-list" aria-live="polite"></div>
+        </div>
 
-            <div id="overview-panel" class="panel glass-panel">
-                <div class="panel-title">Overview</div>
-                <div id="overview-content"></div>
+        <!-- STATS VIEW -->
+        <div id="stats-page" class="hidden">
+            <div id="top-panels">
+                <div id="streaks-panel" class="panel glass-panel">
+                    <div class="panel-title">Top Streaks</div>
+                    <div id="streaks-list"></div>
+                </div>
+
+                <div id="overview-panel" class="panel glass-panel">
+                    <div class="panel-title">Overview</div>
+                    <div id="overview-content"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Habit List / Grid -->
-        <div id="habit-list" aria-live="polite"></div>
+        <!-- View Switcher Pills -->
+        <div id="view-switcher" class="glass-panel">
+            <button id="btn-habits" class="pill-btn active">Habits</button>
+            <button id="btn-stats" class="pill-btn">Stats</button>
+        </div>
 
         <!-- Bottom Controls -->
         <div id="bottom-bar">
@@ -68,12 +78,6 @@ if ('serviceWorker' in navigator) {
                 <input type="text" id="new-habit-input" placeholder="New habit..." maxlength="80" />
                 <input type="color" id="new-habit-color" value="#60a5fa" title="Pick color">
                 <button id="confirm-add" class="glass action-btn">✔</button>
-            </div>
-
-            <div id="export-panel">
-                <button id="export-data" class="glass small">Export</button>
-                <button id="import-data" class="glass small">Import</button>
-                <input type="file" id="import-file" accept="application/json" style="display:none;">
             </div>
         </div>
     </div>
@@ -93,6 +97,6 @@ if ('serviceWorker' in navigator) {
     </div>
 
 <script type="module" src="background.js"></script>
-<script src="app.js?v=2.0.0"></script>
+<script src="app.js?v=3.0.0"></script>
 </body>
 </html>
