@@ -30,7 +30,7 @@ html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -ap
     height: 100vh;
     z-index: -10;
     pointer-events: none;
-    background-image: url('project-background.jpeg'); /* <-- replace with your image */
+    background-image: url('project-background.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -48,15 +48,14 @@ canvas {
     justify-content:space-between;
     gap:12px;
 }
-.left-controls, .right-controls {  
-    display:flex; 
-    align-items:center; gap:8px; }
+
 #center-controls { 
     display:flex; 
     flex-direction:column; 
     align-items:center; 
     gap:6px; 
 }
+
 #date-text { 
     color:white; 
     font-weight:500; 
@@ -65,7 +64,7 @@ canvas {
     text-align:center; 
 }
 
-/* Mode buttons */
+/* Mode buttons (Daily, Weekly, Monthly) */
 .mode-btn {
     border:none;
     padding:6px 8px;
@@ -79,7 +78,7 @@ canvas {
     background: rgba(255,255,255,0.16); 
     transform:translateY(-1px); }
 
-/* top-panels */
+/* Top-Streaks and Overview panels */
 #top-panels { 
     display:flex; 
     gap:12px; 
@@ -124,20 +123,15 @@ canvas {
     transform-origin:left center;
     border: 1px solid rgba(255,255,255,0.06);
 }
-.habit .left {
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
 
-.habit .habit-name { font-size:16px; font-weight:600; }
-.habit .habit-meta { font-size:12px; opacity:0.85; }
-
+/* habit control button positions */
 .habit .actions {
     display:flex;
     gap:8px;
     align-items:center;
 }
+
+/* habit control button styles */
 .action {
     width:44px;
     height:44px;
@@ -151,8 +145,14 @@ canvas {
 }
 
 /* completed style */
-.habit.done { transform: translateX(6px); opacity:0.85; }
-.habit .habit-name.done { text-decoration: line-through; opacity:0.8; }
+.habit.done { 
+    transform: translateX(6px); 
+    opacity:0.85; 
+}
+.habit .habit-name.done { 
+    text-decoration: line-through; 
+    opacity:0.8; 
+}
 
 /* bottom bar */
 #bottom-bar {
@@ -196,24 +196,6 @@ canvas {
 }
 .add-btn:hover {
     background: rgb(255, 255, 255, 0.35);
-}
-
-
-.glass {
-    background: rgba(255,255,255,0.12);
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.18);
-    padding:8px;
-}
-.action-btn {
-    width:40px;
-    height:40px;
-    display:grid;
-    color :white;
-    place-items:center;
-    font-size:20px;
-    border-radius:50%;
-    cursor:pointer;
 }
 
 /* add panel */
