@@ -126,13 +126,13 @@ canvas {
 /* bottom bar */
 #bottom-bar {
     position: fixed;
-    bottom: 20px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
+    gap: 8px;
+    padding: 2px 8px;
     border-radius: 25px;
     background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
@@ -140,7 +140,7 @@ canvas {
     border: 1px solid rgba(255, 255, 255, 0.35);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     z-index: 50;
-    width: calc(100% - 40px);
+    width: calc(100% - 10px);
     max-width: 600px;
     transition: transform 0.25s ease, opacity 0.25s ease;
 }
@@ -152,11 +152,12 @@ canvas {
     padding:8px;
 }
 .action-btn {
-    width:56px;
-    height:56px;
+    width:30px;
+    height:30px;
     display:grid;
+    color :white;
     place-items:center;
-    font-size:26px;
+    font-size:15px;
     border-radius:50%;
     cursor:pointer;
 }
@@ -200,12 +201,12 @@ canvas {
 /* VIEW SWITCHER PILL BUTTONS */
 #view-switcher {
     position: fixed;
-    bottom: 92px; /* above bottom bar */
+    bottom: 65px; /* above bottom bar */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 2px 2px;
     border-radius: 25px;
     background: rgba(255,255,255,0.18);
     backdrop-filter: blur(14px);
@@ -219,12 +220,12 @@ canvas {
     border-radius:20px;
     cursor:pointer;
     font-size:14px;
-    font-weight:600;
+    font-weight:450;
     background: rgba(255,255,255,0.12);
     color:white;
     transition: all 0.2s ease;
 }
 .pill-btn.active {
     background: rgba(255,255,255,0.25);
-    transform: translateY(-1px);
+    transform: translateY(-0.5px);
 }
