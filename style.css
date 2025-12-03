@@ -279,7 +279,7 @@ canvas {
     #center-controls { width:100%; }
 }
 
-/* VIEW SWITCHER PILL BUTTONS */
+/* VIEW SWITCHER PILL BUTTON */
 #view-switcher {
     position: fixed;
     bottom: 95px; /* above bottom bar */
