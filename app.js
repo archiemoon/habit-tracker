@@ -1,7 +1,7 @@
-// app.js v3.3 — no color selection
+// app.js v4.0 simplified
 
-const STORAGE_KEY = "habits_v3";
-const TRACKING_KEY = "tracking_v3";
+const STORAGE_KEY = "habits_v4";
+const TRACKING_KEY = "tracking_v4";
 
 let habits = [];
 let tracking = {};
@@ -41,8 +41,8 @@ function formatDateLong(d) {
 
 function isSameDay(a, b) {
   return a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
+         a.getMonth() === b.getMonth() &&
+         a.getDate() === b.getDate();
 }
 
 function canGoForward() {
@@ -58,11 +58,8 @@ document.body.addEventListener("touchend", e => {
   const endX = e.changedTouches[0].clientX;
   const diff = endX - startX;
   if (Math.abs(diff) < 60) return;
-  if (diff < 0 && canGoForward()) {
-    viewingDate.setDate(viewingDate.getDate() + 1);
-  } else if (diff > 0) {
-    viewingDate.setDate(viewingDate.getDate() - 1);
-  }
+  if (diff < 0 && canGoForward()) viewingDate.setDate(viewingDate.getDate() + 1);
+  else if (diff > 0) viewingDate.setDate(viewingDate.getDate() - 1);
   render();
 });
 
@@ -89,28 +86,23 @@ function renderHabits() {
   list.innerHTML = "";
   const dKey = dateKey(viewingDate);
   ensureDateKey(dKey);
-  const copy = [...habits].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  if (copy.length === 0) {
+  if (habits.length === 0) {
     const hint = document.createElement("div");
     hint.className = "glass-panel";
     hint.style.color = "white";
-    hint.textContent = "No habits yet — add one using the + button";
+    hint.textContent = "No habits yet — why dont we add one!";
     list.appendChild(hint);
     return;
   }
 
-  copy.forEach(h => {
+  habits.forEach(h => {
     const done = !!(tracking[dKey] && tracking[dKey][h.id]);
     const card = document.createElement("div");
     card.className = "habit" + (done ? " done" : "");
-    card.style.background = `linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.06))`;
 
     const left = document.createElement("div");
     left.className = "left";
-    const sw = document.createElement("div");
-    sw.className = "color-swatch";
-    sw.style.background = h.color;
 
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -119,13 +111,7 @@ function renderHabits() {
     name.className = "habit-name" + (done ? " done" : "");
     name.textContent = h.name;
 
-    const created = document.createElement("div");
-    created.className = "habit-meta";
-    created.textContent = `Added ${new Date(h.createdAt).toLocaleDateString()}`;
-
     meta.appendChild(name);
-    meta.appendChild(created);
-    left.appendChild(sw);
     left.appendChild(meta);
 
     const actions = document.createElement("div");
@@ -141,7 +127,7 @@ function renderHabits() {
       setTimeout(() => { saveData(); render(); }, 140);
     });
 
-    const moreBtn = document.createElement("button");
+     const moreBtn = document.createElement("button");
     moreBtn.className = "action";
     moreBtn.title = "More";
     moreBtn.textContent = "⋯";
@@ -167,15 +153,9 @@ function toggleComplete(hid, date) {
 }
 
 function addHabit(name) {
-  const defaultColor = "#60a5fa"; // default color
-  habits.push({ id: uid(), name, color: defaultColor, createdAt: new Date() });
+  habits.push({ id: uid(), name, createdAt: new Date() });
   saveData();
   render();
-}
-
-function updateHabit(id, name) {
-  const h = habits.find(h=>h.id===id);
-  if(h){ h.name=name; saveData(); render(); }
 }
 
 function deleteHabit(id) {
@@ -184,35 +164,6 @@ function deleteHabit(id) {
   saveData();
   render();
 }
-
-/* ---------------- MODAL ---------------- */
-const modal = document.getElementById("modal");
-const editName = document.getElementById("edit-name");
-let editingId = null;
-
-function openEditModal(id) {
-  const h = habits.find(h=>h.id===id);
-  if(!h) return;
-  editingId = id;
-  editName.value = h.name;
-  modal.classList.remove("hidden");
-}
-document.getElementById("cancel-edit").onclick = () => modal.classList.add("hidden");
-document.getElementById("save-edit").onclick = () => {
-  updateHabit(editingId, editName.value);
-  modal.classList.add("hidden");
-};
-document.getElementById("delete-habit").onclick = () => { deleteHabit(editingId); modal.classList.add("hidden"); };
-
-/* ---------------- ADD ---------------- */
-document.getElementById("add-toggle").onclick = () => {
-  const panel = document.getElementById("add-panel");
-  panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-};
-document.getElementById("confirm-add").onclick = () => {
-  const input = document.getElementById("new-habit-input");
-  if(input.value.trim()!==""){ addHabit(input.value.trim()); input.value=""; }
-};
 
 /* ---------------- NAV ---------------- */
 document.getElementById("prev-day").onclick = () => { viewingDate.setDate(viewingDate.getDate()-1); render(); };
@@ -234,17 +185,37 @@ function switchView(view) {
     statsPage.classList.add("hidden");
     btnHabits.classList.add("active");
     btnStats.classList.remove("active");
-    modeContainer.style.display = "none"; // hide on habits page
+    modeContainer.style.display = "none";
   } else {
     habitsPage.classList.add("hidden");
     statsPage.classList.remove("hidden");
     btnHabits.classList.remove("active");
     btnStats.classList.add("active");
-    modeContainer.style.display = "flex"; // show on stats page
+    modeContainer.style.display = "flex";
     renderStreaks();
     renderOverview();
   }
 }
+
+/* ---------------- MODAL ---------------- */
+const modal = document.getElementById("modal");
+const editName = document.getElementById("edit-name");
+let editingId = null;
+
+function openEditModal(id) {
+  const h = habits.find(h=>h.id===id);
+  if(!h) return;
+  editingId = id;
+  editName.value = h.name;
+  modal.classList.remove("hidden");
+}
+document.getElementById("cancel-edit").onclick = () => modal.classList.add("hidden");
+document.getElementById("save-edit").onclick = () => {
+  updateHabit(editingId, editName.value);
+  modal.classList.add("hidden");
+};
+document.getElementById("delete-habit").onclick = () => { deleteHabit(editingId); modal.classList.add("hidden"); };
+
 
 /* ---------------- STATS ---------------- */
 function getStreaks() {
@@ -271,14 +242,17 @@ function renderStreaks() {
   });
 }
 
-// Stats period
+// Add a variable to track stats period
 let statsPeriod = "daily";
+
+// Mode buttons
 const modeButtons = document.querySelectorAll(".mode-btn");
+
 modeButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     modeButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    statsPeriod = btn.id.replace("mode-", "");
+    statsPeriod = btn.id.replace("mode-", ""); // "daily", "weekly", "monthly"
     if (!habitsPage.classList.contains("hidden")) return;
     renderStreaks();
     renderOverview();
@@ -289,6 +263,7 @@ function createWeekGrid(centerDate) {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.gap = "6px";
+
   const start = new Date(centerDate);
   start.setDate(start.getDate() - 3);
   for (let i = 0; i < 7; i++) {
@@ -298,6 +273,7 @@ function createWeekGrid(centerDate) {
     const doneCount = tracking[k] ? Object.values(tracking[k]).filter(Boolean).length : 0;
     const total = habits.length || 1;
     const pct = Math.round((doneCount / total) * 100);
+
     const cell = document.createElement("div");
     cell.style.width = "44px";
     cell.style.height = "44px";
@@ -322,20 +298,24 @@ function createMonthGrid(centerDate) {
   wrapper.style.display = "grid";
   wrapper.style.gridTemplateColumns = "repeat(7, 1fr)";
   wrapper.style.gap = "6px";
+
   const first = new Date(centerDate.getFullYear(), centerDate.getMonth(), 1);
   const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth() + 1, 0).getDate();
   const startDay = first.getDay();
+
   for (let i = 0; i < startDay; i++) {
     const blank = document.createElement("div");
     blank.style.height = "48px";
     wrapper.appendChild(blank);
   }
+
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(centerDate.getFullYear(), centerDate.getMonth(), d);
     const key = dateKey(date);
     const doneCount = tracking[key] ? Object.values(tracking[key]).filter(Boolean).length : 0;
     const total = habits.length || 1;
     const pct = Math.round((doneCount / total) * 100);
+
     const cell = document.createElement("div");
     cell.style.minHeight = "48px";
     cell.style.borderRadius = "8px";
@@ -355,19 +335,31 @@ function createMonthGrid(centerDate) {
 function renderOverview() {
   const container = document.getElementById("overview-content");
   container.innerHTML = "";
+
   if (statsPeriod === "daily") {
     container.textContent = `${habits.length} habits`;
     return;
   }
+
   if (statsPeriod === "weekly") {
     container.appendChild(createWeekGrid(viewingDate));
     return;
   }
+
   if (statsPeriod === "monthly") {
     container.appendChild(createMonthGrid(viewingDate));
     return;
   }
 }
+
+/* ---------------- ADD HABIT ---------------- */
+document.getElementById("add-button").onclick = () => {
+  const input = document.getElementById("new-habit-input");
+  if (input.value.trim() !== "") {
+    addHabit(input.value.trim());
+    input.value = "";
+  }
+};
 
 /* ---------------- INIT ---------------- */
 loadData();

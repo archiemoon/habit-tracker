@@ -59,8 +59,8 @@ canvas {
 }
 #date-text { 
     color:white; 
-    font-weight:600; 
-    font-size:18px; 
+    font-weight:500; 
+    font-size:28px; 
     min-width:160px; 
     text-align:center; 
 }
@@ -161,20 +161,43 @@ canvas {
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    align-items: center;
     gap: 8px;
-    padding: 8px 8px;
+    padding: 2px 8px;
     border-radius: 25px;
     background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     z-index: 50;
-    width: calc(100% - 45px);
+    width: calc(100% - 10px);
     max-width: 600px;
-    transition: transform 0.25s ease, opacity 0.25s ease;
 }
+
+#new-habit-input {
+    flex:1;
+    padding:10px;
+    border-radius:20px;
+    border:none;
+    background: rgba(255,255,255,0.06);
+    color:white;
+    font-size:15px;
+}
+
+.add-btn {
+    border:none;
+    padding:2px 15px;
+    border-radius:50px;
+    background: rgba(255, 255, 255, 0.12);
+    color:white;
+    font-weight:400;
+    font-size: 24px;
+    cursor:pointer;
+    transition: all 0.2s ease;
+}
+.add-btn:hover {
+    background: rgb(255, 255, 255, 0.35);
+}
+
 
 .glass {
     background: rgba(255,255,255,0.12);
@@ -207,12 +230,39 @@ canvas {
 }
 
 /* modal */
-.modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:50; }
-.modal.hidden { display:none; }
-.modal-inner { width:320px; max-width:90%; }
-.modal input { width:100%; padding:8px; margin:6px 0; border-radius:8px; border:1px solid rgba(0,0,0,0.1); }
-.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
-.danger { background: linear-gradient(180deg,var(--danger),#d94e4e); color:white; }
+.modal { 
+    position:fixed; 
+    inset:0; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    z-index:50; 
+}
+.modal.hidden { 
+    display:none; 
+}
+.modal-inner { 
+    color :white;
+    font-weight:450;
+    width:320px; 
+    max-width:90%; 
+}
+.modal input { 
+    width:100%; 
+    padding:8px; 
+    margin:6px 0; 
+    border-radius:8px; 
+    border:1px solid rgba(0,0,0,0.1); 
+}
+.modal-actions { 
+    display:flex; 
+    gap:8px;
+    justify-content:flex-end; 
+    margin-top:8px; 
+}
+.danger { 
+    background: linear-gradient(180deg,var(--danger),#d94e4e); color:white; 
+}
 
 /* utility */
 .hidden { display:none; }
@@ -232,7 +282,7 @@ canvas {
 /* VIEW SWITCHER PILL BUTTONS */
 #view-switcher {
     position: fixed;
-    bottom: 77px; /* above bottom bar */
+    bottom: 66px; /* above bottom bar */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
