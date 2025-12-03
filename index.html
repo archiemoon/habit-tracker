@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Habit Tracker</title>
-    <link rel="stylesheet" href="style.css?v=1.1.4">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Habit Tracker</title>
+<link rel="stylesheet" href="style.css?v=1.1.6">
 </head>
 <body>
     <!-- Animated Background -->
@@ -15,9 +15,9 @@
 
         <!-- Date Bar -->
         <div id="date-bar">
-            <button id="prev-day">&#8592;</button>
+            <button id="prev-day" class="glass">&#8592;</button>
             <span id="date-text">Today</span>
-            <button id="next-day">&#8594;</button>
+            <button id="next-day" class="glass">&#8594;</button>
         </div>
 
         <!-- Habit List -->
@@ -25,16 +25,13 @@
 
         <!-- Bottom Controls -->
         <div id="bottom-bar">
-            <button id="add-toggle">+</button>
+            <button id="add-toggle" class="glass">+</button>
             <input type="text" id="new-habit-input" placeholder="New habit...">
-            <button id="confirm-add">✔</button>
+            <button id="confirm-add" class="glass">✔</button>
         </div>
-
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/ogl@1.0.0/dist/ogl.min.js"></script>
-    <script src="background.js"></script>
-    <script src="app.js?v=1.1.4"></script>
+<script type="module" src="background.js"></script>
+<script src="app.js?v=1.1.6"></script>
 </body>
 </html>
