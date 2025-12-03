@@ -137,7 +137,7 @@ canvas {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 2px 8px;
+    padding: 8px 8px;
     border-radius: 25px;
     background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
@@ -145,7 +145,7 @@ canvas {
     border: 1px solid rgba(255, 255, 255, 0.35);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
     z-index: 50;
-    width: calc(100% - 10px);
+    width: calc(100% - 45px);
     max-width: 600px;
     transition: transform 0.25s ease, opacity 0.25s ease;
 }
@@ -157,12 +157,12 @@ canvas {
     padding:8px;
 }
 .action-btn {
-    width:30px;
-    height:30px;
+    width:40px;
+    height:40px;
     display:grid;
     color :white;
     place-items:center;
-    font-size:15px;
+    font-size:20px;
     border-radius:50%;
     cursor:pointer;
 }
@@ -206,7 +206,7 @@ canvas {
 /* VIEW SWITCHER PILL BUTTONS */
 #view-switcher {
     position: fixed;
-    bottom: 65px; /* above bottom bar */
+    bottom: 77px; /* above bottom bar */
     left: 50%;
     transform: translateX(-50%);
     display: flex;

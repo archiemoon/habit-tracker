@@ -1,4 +1,4 @@
-// app.js v3.1
+// app.js v3.3 — no color selection
 
 const STORAGE_KEY = "habits_v3";
 const TRACKING_KEY = "tracking_v3";
@@ -16,9 +16,8 @@ function loadData() {
   tracking = JSON.parse(localStorage.getItem(TRACKING_KEY)) || {};
 }
 
-// Crypto-safe UID
 function uid() {
-  return crypto.randomUUID();
+  return Math.random().toString(36).slice(2, 9);
 }
 
 /* ---------------- DATE ---------------- */
@@ -52,25 +51,24 @@ function canGoForward() {
   return vk < t;
 }
 
-/* ---------------- SWIPE SUPPORT ---------------- */
+/* swipe support */
 let startX = 0;
 document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
 document.body.addEventListener("touchend", e => {
   const endX = e.changedTouches[0].clientX;
   const diff = endX - startX;
   if (Math.abs(diff) < 60) return;
-  if (diff < 0 && canGoForward()) viewingDate.setDate(viewingDate.getDate() + 1);
-  else if (diff > 0) viewingDate.setDate(viewingDate.getDate() - 1);
+  if (diff < 0 && canGoForward()) {
+    viewingDate.setDate(viewingDate.getDate() + 1);
+  } else if (diff > 0) {
+    viewingDate.setDate(viewingDate.getDate() - 1);
+  }
   render();
 });
 
 /* ---------------- RENDER ---------------- */
 const dateText = () => document.getElementById("date-text");
 const habitListEl = () => document.getElementById("habit-list");
-
-function ensureDateKey(key) {
-  if (!tracking[key]) tracking[key] = {};
-}
 
 function render() {
   if (isSameDay(viewingDate, today)) dateText().textContent = "Today";
@@ -80,6 +78,10 @@ function render() {
 
   if (!habitsPage.classList.contains("hidden")) renderHabits();
   else { renderStreaks(); renderOverview(); }
+}
+
+function ensureDateKey(key) {
+  if (!tracking[key]) tracking[key] = {};
 }
 
 function renderHabits() {
@@ -136,7 +138,8 @@ function renderHabits() {
     toggleBtn.innerHTML = done ? "✓" : "○";
     toggleBtn.addEventListener("click", async () => {
       await toggleComplete(h.id, viewingDate);
-      render();
+      card.classList.add("done");
+      setTimeout(() => { saveData(); render(); }, 140);
     });
 
     const editBtn = document.createElement("button");
@@ -171,15 +174,16 @@ function toggleComplete(hid, date) {
   return Promise.resolve();
 }
 
-function addHabit(name, color) {
-  habits.push({ id: uid(), name, color, createdAt: new Date() });
+function addHabit(name) {
+  const defaultColor = "#60a5fa"; // default color
+  habits.push({ id: uid(), name, color: defaultColor, createdAt: new Date() });
   saveData();
   render();
 }
 
-function updateHabit(id, name, color) {
+function updateHabit(id, name) {
   const h = habits.find(h=>h.id===id);
-  if(h){ h.name=name; h.color=color; saveData(); render(); }
+  if(h){ h.name=name; saveData(); render(); }
 }
 
 function deleteHabit(id) {
@@ -192,7 +196,6 @@ function deleteHabit(id) {
 /* ---------------- MODAL ---------------- */
 const modal = document.getElementById("modal");
 const editName = document.getElementById("edit-name");
-const editColor = document.getElementById("edit-color");
 let editingId = null;
 
 function openEditModal(id) {
@@ -200,12 +203,11 @@ function openEditModal(id) {
   if(!h) return;
   editingId = id;
   editName.value = h.name;
-  editColor.value = h.color;
   modal.classList.remove("hidden");
 }
 document.getElementById("cancel-edit").onclick = () => modal.classList.add("hidden");
 document.getElementById("save-edit").onclick = () => {
-  updateHabit(editingId, editName.value, editColor.value);
+  updateHabit(editingId, editName.value);
   modal.classList.add("hidden");
 };
 document.getElementById("delete-habit").onclick = () => { deleteHabit(editingId); modal.classList.add("hidden"); };
@@ -217,8 +219,7 @@ document.getElementById("add-toggle").onclick = () => {
 };
 document.getElementById("confirm-add").onclick = () => {
   const input = document.getElementById("new-habit-input");
-  const color = document.getElementById("new-habit-color").value;
-  if(input.value.trim()!==""){ addHabit(input.value.trim(), color); input.value=""; }
+  if(input.value.trim()!==""){ addHabit(input.value.trim()); input.value=""; }
 };
 
 /* ---------------- NAV ---------------- */
@@ -234,20 +235,6 @@ const statsPage = document.getElementById("stats-page");
 btnHabits.addEventListener("click", () => switchView("habits"));
 btnStats.addEventListener("click", () => switchView("stats"));
 
-let statsPeriod = "daily";
-const modeButtons = document.querySelectorAll(".mode-btn");
-
-modeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    if(habitsPage.classList.contains("hidden")){
-      modeButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      statsPeriod = btn.id.replace("mode-", "");
-      renderOverview();
-    }
-  });
-});
-
 function switchView(view) {
   const modeContainer = document.getElementById("view-mode");
   if(view==="habits"){
@@ -255,13 +242,13 @@ function switchView(view) {
     statsPage.classList.add("hidden");
     btnHabits.classList.add("active");
     btnStats.classList.remove("active");
-    modeContainer.style.display = "none";
+    modeContainer.style.display = "none"; // hide on habits page
   } else {
     habitsPage.classList.add("hidden");
     statsPage.classList.remove("hidden");
     btnHabits.classList.remove("active");
     btnStats.classList.add("active");
-    modeContainer.style.display = "flex";
+    modeContainer.style.display = "flex"; // show on stats page
     renderStreaks();
     renderOverview();
   }
@@ -269,7 +256,7 @@ function switchView(view) {
 
 /* ---------------- STATS ---------------- */
 function getStreaks() {
-  return habits.map(h=>{
+  const streaks = habits.map(h=>{
     let max=0, cur=0;
     const sortedDays = Object.keys(tracking).sort();
     sortedDays.forEach(d=>{
@@ -277,7 +264,8 @@ function getStreaks() {
       if(cur>max) max=cur;
     });
     return { name:h.name, streak:max };
-  }).sort((a,b)=>b.streak-a.streak);
+  });
+  return streaks.sort((a,b)=>b.streak-a.streak);
 }
 
 function renderStreaks() {
@@ -291,66 +279,102 @@ function renderStreaks() {
   });
 }
 
+// Stats period
+let statsPeriod = "daily";
+const modeButtons = document.querySelectorAll(".mode-btn");
+modeButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    modeButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    statsPeriod = btn.id.replace("mode-", "");
+    if (!habitsPage.classList.contains("hidden")) return;
+    renderStreaks();
+    renderOverview();
+  });
+});
+
 function createWeekGrid(centerDate) {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.gap = "6px";
-  const start = new Date(centerDate); start.setDate(start.getDate() - 3);
-  for (let i=0;i<7;i++){
-    const d = new Date(start); d.setDate(start.getDate()+i);
+  const start = new Date(centerDate);
+  start.setDate(start.getDate() - 3);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
     const k = dateKey(d);
-    const doneCount = tracking[k]? Object.values(tracking[k]).filter(Boolean).length : 0;
+    const doneCount = tracking[k] ? Object.values(tracking[k]).filter(Boolean).length : 0;
     const total = habits.length || 1;
-    const pct = Math.round((doneCount/total)*100);
+    const pct = Math.round((doneCount / total) * 100);
     const cell = document.createElement("div");
-    cell.style.width="44px"; cell.style.height="44px";
-    cell.style.borderRadius="8px"; cell.style.display="flex";
-    cell.style.flexDirection="column"; cell.style.alignItems="center";
-    cell.style.justifyContent="center"; cell.style.fontSize="12px";
-    cell.style.fontWeight="700"; cell.style.color="white";
-    cell.style.background=`linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    cell.style.border=`1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML=`<div style="font-weight:600">${d.toLocaleDateString('en-GB',{weekday:'short'})}</div><div style="font-size:11px;margin-top:4px">${pct}%</div>`;
+    cell.style.width = "44px";
+    cell.style.height = "44px";
+    cell.style.borderRadius = "8px";
+    cell.style.display = "flex";
+    cell.style.flexDirection = "column";
+    cell.style.alignItems = "center";
+    cell.style.justifyContent = "center";
+    cell.style.fontSize = "12px";
+    cell.style.fontWeight = "700";
+    cell.style.color = "white";
+    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
+    cell.style.border = `1px solid rgba(255,255,255,0.06)`;
+    cell.innerHTML = `<div style="font-weight:600">${d.toLocaleDateString('en-GB',{weekday:'short'})}</div><div style="font-size:11px;margin-top:4px">${pct}%</div>`;
     wrapper.appendChild(cell);
   }
   return wrapper;
 }
 
-function createMonthGrid(centerDate){
+function createMonthGrid(centerDate) {
   const wrapper = document.createElement("div");
-  wrapper.style.display="grid"; wrapper.style.gridTemplateColumns="repeat(7,1fr)"; wrapper.style.gap="6px";
+  wrapper.style.display = "grid";
+  wrapper.style.gridTemplateColumns = "repeat(7, 1fr)";
+  wrapper.style.gap = "6px";
   const first = new Date(centerDate.getFullYear(), centerDate.getMonth(), 1);
-  const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth()+1,0).getDate();
+  const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth() + 1, 0).getDate();
   const startDay = first.getDay();
-  for(let i=0;i<startDay;i++){
+  for (let i = 0; i < startDay; i++) {
     const blank = document.createElement("div");
-    blank.style.height="48px";
+    blank.style.height = "48px";
     wrapper.appendChild(blank);
   }
-  for(let d=1; d<=daysInMonth; d++){
+  for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(centerDate.getFullYear(), centerDate.getMonth(), d);
     const key = dateKey(date);
-    const doneCount = tracking[key]? Object.values(tracking[key]).filter(Boolean).length : 0;
+    const doneCount = tracking[key] ? Object.values(tracking[key]).filter(Boolean).length : 0;
     const total = habits.length || 1;
-    const pct = Math.round((doneCount/total)*100);
+    const pct = Math.round((doneCount / total) * 100);
     const cell = document.createElement("div");
-    cell.style.minHeight="48px"; cell.style.borderRadius="8px";
-    cell.style.display="flex"; cell.style.alignItems="center"; cell.style.justifyContent="center";
-    cell.style.fontSize="13px"; cell.style.color="white";
-    cell.style.background=`linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    cell.style.border=`1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML=`<div style="text-align:center"><div style="font-weight:700">${d}</div><div style="font-size:11px;margin-top:6px">${pct}%</div></div>`;
+    cell.style.minHeight = "48px";
+    cell.style.borderRadius = "8px";
+    cell.style.display = "flex";
+    cell.style.alignItems = "center";
+    cell.style.justifyContent = "center";
+    cell.style.fontSize = "13px";
+    cell.style.color = "white";
+    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
+    cell.style.border = `1px solid rgba(255,255,255,0.06)`;
+    cell.innerHTML = `<div style="text-align:center"><div style="font-weight:700">${d}</div><div style="font-size:11px;margin-top:6px">${pct}%</div></div>`;
     wrapper.appendChild(cell);
   }
   return wrapper;
 }
 
-function renderOverview(){
+function renderOverview() {
   const container = document.getElementById("overview-content");
-  container.innerHTML="";
-  if(statsPeriod==="daily"){ container.textContent=`${habits.length} habits`; return; }
-  if(statsPeriod==="weekly"){ container.appendChild(createWeekGrid(viewingDate)); return; }
-  if(statsPeriod==="monthly"){ container.appendChild(createMonthGrid(viewingDate)); return; }
+  container.innerHTML = "";
+  if (statsPeriod === "daily") {
+    container.textContent = `${habits.length} habits`;
+    return;
+  }
+  if (statsPeriod === "weekly") {
+    container.appendChild(createWeekGrid(viewingDate));
+    return;
+  }
+  if (statsPeriod === "monthly") {
+    container.appendChild(createMonthGrid(viewingDate));
+    return;
+  }
 }
 
 /* ---------------- INIT ---------------- */
