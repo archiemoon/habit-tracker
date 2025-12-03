@@ -105,7 +105,6 @@ function renderHabits() {
     const card = document.createElement("div");
     card.className = "habit" + (done ? " done" : "");
     card.style.background = `linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.06))`;
-    card.style.borderLeft = `6px solid ${h.color}`;
 
     const left = document.createElement("div");
     left.className = "left";
@@ -142,12 +141,6 @@ function renderHabits() {
       setTimeout(() => { saveData(); render(); }, 140);
     });
 
-    const editBtn = document.createElement("button");
-    editBtn.className = "action";
-    editBtn.title = "Edit";
-    editBtn.textContent = "✎";
-    editBtn.addEventListener("click", () => openEditModal(h.id));
-
     const moreBtn = document.createElement("button");
     moreBtn.className = "action";
     moreBtn.title = "More";
@@ -155,7 +148,6 @@ function renderHabits() {
     moreBtn.addEventListener("click", () => openEditModal(h.id));
 
     actions.appendChild(toggleBtn);
-    actions.appendChild(editBtn);
     actions.appendChild(moreBtn);
 
     card.appendChild(left);
