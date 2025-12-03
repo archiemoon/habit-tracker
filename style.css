@@ -110,7 +110,7 @@ canvas {
 /* habit card */
 .habit {
     background: rgba(255,255,255,0.06); 
-    backdrop-filter: blur(3px);
+    backdrop-filter: blur(0.25px);
     -webkit-backdrop-filter: blur(12px);
     display:flex;
     align-items:center;
@@ -217,9 +217,27 @@ canvas {
 }
 
 /* add panel */
-.add-panel { display:flex; gap:8px; align-items:center; flex:1; }
-#new-habit-input { flex:1; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:white; font-size:15px; display:block; }
-#new-habit-color { width:48px; height:40px; border-radius:8px; border:none; }
+.add-panel { 
+    display:flex; 
+    gap:8px; 
+    align-items:center; 
+    flex:1; 
+}
+#new-habit-input { 
+    flex:1; 
+    padding:10px; 
+    border-radius:10px; 
+    border:1px solid rgba(255,255,255,0.08); background:transparent; 
+    color:white; 
+    font-size:15px; 
+    display:block; 
+}
+#new-habit-color { 
+    width:48px; 
+    height:40px; 
+    border-radius:8px; 
+    border:none; 
+}
 
 /* glass-panel for panels/modals */
 .glass-panel {
@@ -265,12 +283,21 @@ canvas {
 }
 
 /* utility */
-.hidden { display:none; }
-.panel-title { font-weight:600; }
+.hidden { 
+    display:none; 
+}
+.panel-title { 
+    font-weight:600; 
+}
 
 /* make scrollbar unobtrusive */
-#habit-list::-webkit-scrollbar { width:10px; height:10px; }
-#habit-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius:10px; }
+#habit-list::-webkit-scrollbar { 
+    width:10px; height:10px; 
+}
+#habit-list::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.06); 
+    border-radius:10px; 
+}
 
 /* responsive */
 @media (max-width:720px) {
