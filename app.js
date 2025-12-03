@@ -1,4 +1,4 @@
-// app.js v3.0
+// app.js v3.1
 
 const STORAGE_KEY = "habits_v3";
 const TRACKING_KEY = "tracking_v3";
@@ -16,8 +16,9 @@ function loadData() {
   tracking = JSON.parse(localStorage.getItem(TRACKING_KEY)) || {};
 }
 
+// Crypto-safe UID
 function uid() {
-  return Math.random().toString(36).slice(2, 9);
+  return crypto.randomUUID();
 }
 
 /* ---------------- DATE ---------------- */
@@ -51,9 +52,25 @@ function canGoForward() {
   return vk < t;
 }
 
+/* ---------------- SWIPE SUPPORT ---------------- */
+let startX = 0;
+document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+document.body.addEventListener("touchend", e => {
+  const endX = e.changedTouches[0].clientX;
+  const diff = endX - startX;
+  if (Math.abs(diff) < 60) return;
+  if (diff < 0 && canGoForward()) viewingDate.setDate(viewingDate.getDate() + 1);
+  else if (diff > 0) viewingDate.setDate(viewingDate.getDate() - 1);
+  render();
+});
+
 /* ---------------- RENDER ---------------- */
 const dateText = () => document.getElementById("date-text");
 const habitListEl = () => document.getElementById("habit-list");
+
+function ensureDateKey(key) {
+  if (!tracking[key]) tracking[key] = {};
+}
 
 function render() {
   if (isSameDay(viewingDate, today)) dateText().textContent = "Today";
@@ -63,10 +80,6 @@ function render() {
 
   if (!habitsPage.classList.contains("hidden")) renderHabits();
   else { renderStreaks(); renderOverview(); }
-}
-
-function ensureDateKey(key) {
-  if (!tracking[key]) tracking[key] = {};
 }
 
 function renderHabits() {
@@ -123,8 +136,7 @@ function renderHabits() {
     toggleBtn.innerHTML = done ? "✓" : "○";
     toggleBtn.addEventListener("click", async () => {
       await toggleComplete(h.id, viewingDate);
-      card.classList.add("done");
-      setTimeout(() => { saveData(); render(); }, 140);
+      render();
     });
 
     const editBtn = document.createElement("button");
@@ -222,17 +234,34 @@ const statsPage = document.getElementById("stats-page");
 btnHabits.addEventListener("click", () => switchView("habits"));
 btnStats.addEventListener("click", () => switchView("stats"));
 
+let statsPeriod = "daily";
+const modeButtons = document.querySelectorAll(".mode-btn");
+
+modeButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    if(habitsPage.classList.contains("hidden")){
+      modeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      statsPeriod = btn.id.replace("mode-", "");
+      renderOverview();
+    }
+  });
+});
+
 function switchView(view) {
+  const modeContainer = document.getElementById("view-mode");
   if(view==="habits"){
     habitsPage.classList.remove("hidden");
     statsPage.classList.add("hidden");
     btnHabits.classList.add("active");
     btnStats.classList.remove("active");
+    modeContainer.style.display = "none";
   } else {
     habitsPage.classList.add("hidden");
     statsPage.classList.remove("hidden");
     btnHabits.classList.remove("active");
     btnStats.classList.add("active");
+    modeContainer.style.display = "flex";
     renderStreaks();
     renderOverview();
   }
@@ -240,7 +269,7 @@ function switchView(view) {
 
 /* ---------------- STATS ---------------- */
 function getStreaks() {
-  const streaks = habits.map(h=>{
+  return habits.map(h=>{
     let max=0, cur=0;
     const sortedDays = Object.keys(tracking).sort();
     sortedDays.forEach(d=>{
@@ -248,8 +277,7 @@ function getStreaks() {
       if(cur>max) max=cur;
     });
     return { name:h.name, streak:max };
-  });
-  return streaks.sort((a,b)=>b.streak-a.streak);
+  }).sort((a,b)=>b.streak-a.streak);
 }
 
 function renderStreaks() {
@@ -263,138 +291,67 @@ function renderStreaks() {
   });
 }
 
-// Add a variable to track stats period
-let statsPeriod = "daily";
-
-// Mode buttons
-const modeButtons = document.querySelectorAll(".mode-btn");
-
-modeButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    modeButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    statsPeriod = btn.id.replace("mode-", ""); // "daily", "weekly", "monthly"
-    if (!habitsPage.classList.contains("hidden")) return; // only update stats
-    renderStreaks();
-    renderOverview();
-  });
-});
-
 function createWeekGrid(centerDate) {
   const wrapper = document.createElement("div");
   wrapper.style.display = "flex";
   wrapper.style.gap = "6px";
-
-  // 7-day range centered on viewingDate
-  const start = new Date(centerDate);
-  start.setDate(start.getDate() - 3); // show 3 days before
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+  const start = new Date(centerDate); start.setDate(start.getDate() - 3);
+  for (let i=0;i<7;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
     const k = dateKey(d);
-    const doneCount = tracking[k] ? Object.values(tracking[k]).filter(Boolean).length : 0;
+    const doneCount = tracking[k]? Object.values(tracking[k]).filter(Boolean).length : 0;
     const total = habits.length || 1;
-    const pct = Math.round((doneCount / total) * 100);
-
+    const pct = Math.round((doneCount/total)*100);
     const cell = document.createElement("div");
-    cell.style.width = "44px";
-    cell.style.height = "44px";
-    cell.style.borderRadius = "8px";
-    cell.style.display = "flex";
-    cell.style.flexDirection = "column";
-    cell.style.alignItems = "center";
-    cell.style.justifyContent = "center";
-    cell.style.fontSize = "12px";
-    cell.style.fontWeight = "700";
-    cell.style.color = "white";
-    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    cell.style.border = `1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML = `<div style="font-weight:600">${d.toLocaleDateString('en-GB',{weekday:'short'})}</div><div style="font-size:11px;margin-top:4px">${pct}%</div>`;
+    cell.style.width="44px"; cell.style.height="44px";
+    cell.style.borderRadius="8px"; cell.style.display="flex";
+    cell.style.flexDirection="column"; cell.style.alignItems="center";
+    cell.style.justifyContent="center"; cell.style.fontSize="12px";
+    cell.style.fontWeight="700"; cell.style.color="white";
+    cell.style.background=`linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
+    cell.style.border=`1px solid rgba(255,255,255,0.06)`;
+    cell.innerHTML=`<div style="font-weight:600">${d.toLocaleDateString('en-GB',{weekday:'short'})}</div><div style="font-size:11px;margin-top:4px">${pct}%</div>`;
     wrapper.appendChild(cell);
   }
   return wrapper;
 }
 
-function createMonthGrid(centerDate) {
+function createMonthGrid(centerDate){
   const wrapper = document.createElement("div");
-  wrapper.style.display = "grid";
-  wrapper.style.gridTemplateColumns = "repeat(7, 1fr)";
-  wrapper.style.gap = "6px";
-
+  wrapper.style.display="grid"; wrapper.style.gridTemplateColumns="repeat(7,1fr)"; wrapper.style.gap="6px";
   const first = new Date(centerDate.getFullYear(), centerDate.getMonth(), 1);
-  const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth() + 1, 0).getDate();
-  const startDay = first.getDay(); // 0=Sun
-
-  for (let i = 0; i < startDay; i++) {
+  const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth()+1,0).getDate();
+  const startDay = first.getDay();
+  for(let i=0;i<startDay;i++){
     const blank = document.createElement("div");
-    blank.style.height = "48px";
+    blank.style.height="48px";
     wrapper.appendChild(blank);
   }
-
-  for (let d = 1; d <= daysInMonth; d++) {
+  for(let d=1; d<=daysInMonth; d++){
     const date = new Date(centerDate.getFullYear(), centerDate.getMonth(), d);
     const key = dateKey(date);
-    const doneCount = tracking[key] ? Object.values(tracking[key]).filter(Boolean).length : 0;
+    const doneCount = tracking[key]? Object.values(tracking[key]).filter(Boolean).length : 0;
     const total = habits.length || 1;
-    const pct = Math.round((doneCount / total) * 100);
-
+    const pct = Math.round((doneCount/total)*100);
     const cell = document.createElement("div");
-    cell.style.minHeight = "48px";
-    cell.style.borderRadius = "8px";
-    cell.style.display = "flex";
-    cell.style.alignItems = "center";
-    cell.style.justifyContent = "center";
-    cell.style.fontSize = "13px";
-    cell.style.color = "white";
-    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    cell.style.border = `1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML = `<div style="text-align:center"><div style="font-weight:700">${d}</div><div style="font-size:11px;margin-top:6px">${pct}%</div></div>`;
+    cell.style.minHeight="48px"; cell.style.borderRadius="8px";
+    cell.style.display="flex"; cell.style.alignItems="center"; cell.style.justifyContent="center";
+    cell.style.fontSize="13px"; cell.style.color="white";
+    cell.style.background=`linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
+    cell.style.border=`1px solid rgba(255,255,255,0.06)`;
+    cell.innerHTML=`<div style="text-align:center"><div style="font-weight:700">${d}</div><div style="font-size:11px;margin-top:6px">${pct}%</div></div>`;
     wrapper.appendChild(cell);
   }
   return wrapper;
 }
 
-
-// Show/hide the mode buttons depending on the view
-function switchView(view) {
-  const modeContainer = document.getElementById("view-mode");
-  if(view==="habits"){
-    habitsPage.classList.remove("hidden");
-    statsPage.classList.add("hidden");
-    btnHabits.classList.add("active");
-    btnStats.classList.remove("active");
-    modeContainer.style.display = "none"; // hide on habits page
-  } else {
-    habitsPage.classList.add("hidden");
-    statsPage.classList.remove("hidden");
-    btnHabits.classList.remove("active");
-    btnStats.classList.add("active");
-    modeContainer.style.display = "flex"; // show on stats page
-    renderStreaks();
-    renderOverview();
-  }
-}
-
-function renderOverview() {
+function renderOverview(){
   const container = document.getElementById("overview-content");
-  container.innerHTML = "";
-
-  if (statsPeriod === "daily") {
-    container.textContent = `${habits.length} habits`;
-    return;
-  }
-
-  if (statsPeriod === "weekly") {
-    container.appendChild(createWeekGrid(viewingDate));
-    return;
-  }
-
-  if (statsPeriod === "monthly") {
-    container.appendChild(createMonthGrid(viewingDate));
-    return;
-  }
+  container.innerHTML="";
+  if(statsPeriod==="daily"){ container.textContent=`${habits.length} habits`; return; }
+  if(statsPeriod==="weekly"){ container.appendChild(createWeekGrid(viewingDate)); return; }
+  if(statsPeriod==="monthly"){ container.appendChild(createMonthGrid(viewingDate)); return; }
 }
-
 
 /* ---------------- INIT ---------------- */
 loadData();

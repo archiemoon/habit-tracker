@@ -21,6 +21,7 @@ html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -ap
     z-index:10;
 }
 
+/* background */
 #bg {
     position: fixed;
     top: 0;
@@ -29,6 +30,10 @@ html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -ap
     height: 100vh;
     z-index: -10;
     pointer-events: none;
+    background-image: url('project-background.jpeg'); /* <-- replace with your image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 canvas {
     display: block;
