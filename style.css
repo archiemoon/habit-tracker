@@ -154,7 +154,7 @@ HABIT CARDS
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
+    padding: 14px 14px;
     background: rgba(20,20,20,0.4);
     backdrop-filter: blur(2px);
 }
@@ -176,7 +176,7 @@ HABIT CARDS
 }
 
 .action {
-    padding: 6px 8px;
+    padding: 6px 10px;
     border-radius: 50px;
     cursor: pointer;
     border: none;
