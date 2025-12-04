@@ -22,10 +22,10 @@
 
             <div id="center-controls">
                 <span id="date-text">Today</span>
-                <div id="view-mode">
-                    <button id="mode-daily" class="mode-btn active">Daily</button>
-                    <button id="mode-weekly" class="mode-btn">Weekly</button>
-                    <button id="mode-monthly" class="mode-btn">Monthly</button>
+                <div id="mode-switcher" class="mode-btn-container">
+                    <button id="mode-daily" class="mode-btn active glass">Daily</button>
+                    <button id="mode-weekly" class="mode-btn glass">Weekly</button>
+                    <button id="mode-monthly" class="mode-btn glass">Monthly</button>
                 </div>
             </div>
 
@@ -42,12 +42,12 @@
         <!-- STATS VIEW -->
         <div id="stats-page" class="hidden">
             <div id="top-panels">
-                <div id="streaks-panel" class="panel glass-panel">
+                <div id="streaks-panel" class="panel glass">
                     <div class="panel-title">Top Streaks</div>
                     <div id="streaks-list"></div>
                 </div>
 
-                <div id="overview-panel" class="panel glass-panel">
+                <div id="overview-panel" class="panel glass">
                     <div class="panel-title">Overview</div>
                     <div id="overview-content"></div>
                 </div>
@@ -55,32 +55,31 @@
         </div>
 
         <!-- View Switcher Pills -->
-        <div id="view-switcher" class="glass-panel">
-            <button id="btn-habits" class="pill-btn active">Habits</button>
-            <button id="btn-stats" class="pill-btn">Stats</button>
+        <div id="view-switcher" class="glass">
+            <button id="btn-habits" class="pill-btn active glass">Habits</button>
+            <button id="btn-stats" class="pill-btn glass">Stats</button>
         </div>
 
-<!-- Bottom Controls -->
-<!-- Bottom Controls -->
-<div id="bottom-bar">
-  <input type="text" id="new-habit-input" placeholder="New habit..." maxlength="80" />
-  <button id="add-button" class="add-btn">+</button>
-</div>
-
-
-<!-- Edit Modal -->
-<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-inner glass-panel">
-        <h3>Edit habit</h3>
-        <input id="edit-name" type="text" maxlength="80" />
-        <div class="modal-actions">
-            <button id="save-edit" class="glass action-btn">✔</button>
-            <button id="cancel-edit" class="glass action-btn">x</button>
-            <button id="delete-habit" class="glass danger">Delete</button>
+        <!-- Bottom Controls -->
+        <div id="bottom-bar" class="glass">
+            <input type="text" id="new-habit-input" class="glass" placeholder="New habit..." maxlength="80" />
+            <button id="add-button" class="add-btn glass">+</button>
         </div>
+
+        <!-- Edit Modal -->
+        <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+            <div class="modal-inner glass panel">
+                <h3>Edit habit</h3>
+                <input id="edit-name" class="glass" type="text" maxlength="80" />
+                <div class="modal-actions">
+                    <button id="save-edit" class="action-btn glass">✔</button>
+                    <button id="cancel-edit" class="action-btn glass">x</button>
+                    <button id="delete-habit" class="danger glass">Delete</button>
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
-
 
 <script src="app.js?v=3.2"></script>
 </body>

@@ -1,325 +1,313 @@
-/* Reset & base */
-:root {
-    --glass-bg: rgba(255,255,255,0.12);
-    --glass-border: rgba(255,255,255,0.18);
-    --accent: #60a5fa;
-    --danger: #ff6666;
-    --card-radius: 12px;
-}
-* { box-sizing: border-box; }
-html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: transparent; overflow:hidden; }
+/* =======================================================
+   UNIVERSAL GLASS SYSTEM
+   All components inherit from .glass
+   Adjust per-element using CSS variables:
+   --frost: opacity of frosted layer (0–1)
+   --blur: blur strength
+======================================================= */
 
-/* App layout */
-#app {
-    height:100vh;
-    width:100vw;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    padding: 12px;
-    position:relative;
-    z-index:10;
+.glass {
+    --frost: 0.25;        /* default transparency */
+    --blur: 16px;         /* default blur */
+    --border: rgba(255,255,255,0.22);
+
+    background: rgba(255, 255, 255, var(--frost));
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border: 1px solid var(--border);
+    border-radius: 14px;
 }
 
-/* background */
+/* =======================================================
+   BASE RESET / LAYOUT
+======================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, sans-serif;
+}
+
+body {
+    overflow: hidden;
+    background: #000;
+    color: white;
+}
+
+/* Background image or gradient */
 #bg {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
     z-index: -10;
     pointer-events: none;
     background-image: url('project-background.jpeg');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
 }
 
-/* Date bar */
-#date-bar {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-}
-
-#center-controls { 
-    display:flex; 
-    flex-direction:column; 
-    align-items:center; 
-    gap:6px; 
-}
-
-#date-text { 
-    color:white; 
-    font-weight:500; 
-    font-size:28px; 
-    min-width:160px; 
-    text-align:center; 
-}
-
-/* Mode buttons (Daily, Weekly, Monthly) */
-.mode-btn {
-    border:none;
-    padding:6px 8px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.06);
-    color: white;
-    cursor:pointer;
-    font-size:12px;
-}
-.mode-btn.active { 
-    background: rgba(255,255,255,0.16); 
-    transform:translateY(-1px); }
-
-/* Top-Streaks and Overview panels */
-#top-panels { 
-    display:flex; 
-    gap:12px; 
-    flex-wrap:wrap; }
-.panel { 
-    flex:1; 
-    padding:10px; 
-    min-height:64px; 
-    border-radius:var(--card-radius); 
-    border:1px solid var(--glass-border); 
-    background:var(--glass-bg); 
-    color:white; }
-.panel-title { 
-    font-size:13px; 
-    opacity:0.9; 
-    margin-bottom:8px; }
-
-/* habit list */
-#habit-list {
-    flex:1;
-    overflow:auto;
-    padding:8px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-/* habit card */
-.habit {
-    background: rgba(255,255,255,0.06); 
-    backdrop-filter: blur(0.25px);
-    -webkit-backdrop-filter: blur(12px);
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:12px;
-    border-radius:12px;
-    color:white;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
-    transition: transform 180ms ease, opacity 180ms ease;
-    transform-origin:left center;
-    border: 1px solid rgba(255,255,255,0.06);
-}
-
-/* habit control button positions */
-.habit .actions {
-    display:flex;
-    gap:8px;
-    align-items:center;
-}
-
-/* habit control button styles */
-.action {
-    width:44px;
-    height:44px;
-    border-radius:10px;
-    border:none;
-    background: rgba(255,255,255,0.06);
-    cursor:pointer;
-    display:grid;
-    place-items:center;
-    font-size:16px;
-}
-
-/* completed style */
-.habit.done { 
-    transform: translateX(6px); 
-    opacity:0.85; 
-}
-.habit .habit-name.done { 
-    text-decoration: line-through; 
-    opacity:0.8; 
-}
-
-/* bottom bar */
-#bottom-bar {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+/* App Wrapper */
+#app {
+    position: relative;
+    height: 100vh;
     display: flex;
-    gap: 8px;
-    padding: 10px 10px;
-    border-radius: 25px;
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    z-index: 50;
-    width: calc(100% - 50px);
-    max-width: 600px;
+    flex-direction: column;
 }
 
-.add-btn {
-    border:none;
-    padding:2px 15px;
-    border-radius:25px;
-    background: rgba(255, 255, 255, 0.12);
-    color:white;
-    font-weight:400;
-    font-size: 24px;
-    cursor:pointer;
-    transition: all 0.2s ease;
-}
-.add-btn:hover {
-    background: rgb(255, 255, 255, 0.35);
+/* =======================================================
+   DATE BAR / NAVIGATION
+======================================================= */
+
+#date-bar {
+    margin-top: 10px;
+    font-size: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    height: 70px;
 }
 
-/* glass style for habit edit buttons */
-.glass {
+.nav-btn {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Center: date text + stats mode buttons */
+#center-controls {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#mode-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+
+    padding: 4px;
+    border-radius: 50px;
+
+    background: rgba(20,20,20,0.4);
+    border: 1px solid rgba(255,255,255,0.35);
+    backdrop-filter: blur(10px);
+
+    margin: 0 auto; /* centers the whole container */
+}
+
+/* Daily / Weekly / Monthly buttons */
+.mode-btn {
+    color: white;
+    padding: 4px 10px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.18);
     background: rgba(255,255,255,0.12);
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.18);
-    padding:8px;
-}
-.action-btn {
-    width:40px;
-    height:40px;
-    display:grid;
-    color :white;
-    place-items:center;
-    font-size:20px;
-    border-radius:50%;
-    cursor:pointer;
+    cursor: pointer;
 }
 
-/* add panel */
-.add-panel { 
-    display:flex; 
-    gap:8px; 
-    align-items:center; 
-    flex:1; 
-}
-#new-habit-input { 
-    flex:1; 
-    padding:10px; 
-    border-radius:10px; 
-    border:1px solid rgba(255,255,255,0.08); 
-    background:transparent; 
-    color:white; 
-    font-size:15px; 
-    display:block; 
-}
-#new-habit-color { 
-    width:48px; 
-    height:40px; 
-    border-radius:8px; 
-    border:none; 
+.mode-btn.active {
+    background: rgba(255,255,255,0.32);
+    transform: translateY(-1px);
 }
 
-/* glass-panel for panels/modals */
-.glass-panel {
-    background: rgba(255,255,255,0.06);
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.14);
-    padding:12px;
-}
-
-/* modal */
-.modal { 
-    position:fixed; 
-    inset:0; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    z-index:50; 
-}
-.modal.hidden { 
-    display:none; 
-}
-.modal-inner { 
-    color :white;
-    font-weight:450;
-    width:320px; 
-    max-width:90%; 
-}
-.modal input { 
-    width:100%; 
-    padding:8px; 
-    margin:6px 0; 
-    border-radius:8px; 
-    border:1px solid rgba(0,0,0,0.1); 
-}
-.modal-actions { 
-    display:flex; 
-    gap:8px;
-    justify-content:flex-end; 
-    margin-top:8px; 
-}
-.danger { 
-    background: linear-gradient(180deg,var(--danger),#d94e4e); color:white; 
-}
-
-/* utility page switcher */
-.hidden { 
-    display:none; 
-}
-.panel-title { 
-    font-weight:600; 
-}
-
-/* make scrollbar unobtrusive */
-#habit-list::-webkit-scrollbar { 
-    width:10px; height:10px; 
-}
-#habit-list::-webkit-scrollbar-thumb { 
-    background: rgba(255,255,255,0.06); 
-    border-radius:10px; 
-}
-
-/* responsive date select buttons */
+/* Responsive */
 @media (max-width:720px) {
     #top-panels { flex-direction:column; }
     .left-controls, .right-controls { display:none; }
     #center-controls { width:100%; }
 }
 
-/* VIEW SWITCHER PILL BUTTON */
+/* =======================================================
+   HABIT CARDS
+======================================================= */
+
+.habit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    margin: 10px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.habit.done {
+    opacity: 0.65;
+}
+
+.habit-name.done {
+    text-decoration: line-through;
+    opacity: 0.65;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action {
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    background: rgba(255,255,255,0.12);
+}
+
+.action.toggle {
+    font-size: 16px;
+}
+
+/* =======================================================
+   PANELS (Stats)
+======================================================= */
+
+.panel {
+    padding: 14px;
+    border-radius: 14px;
+    margin: 10px;
+}
+
+.panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* =======================================================
+   VIEW SWITCHER (Bottom Pills)
+======================================================= */
+
 #view-switcher {
     position: fixed;
-    bottom: 95px; /* above bottom bar */
+    bottom: 103px;
     left: 50%;
     transform: translateX(-50%);
+
+    background: rgba(20,20,20,0.4);
+    backdrop-filter: blur(10px);
+
     display: flex;
-    gap: 8px;
-    padding: 2px 2px;
-    border-radius: 25px;
-    background: rgba(255,255,255,0.18);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.35);
-    z-index: 50;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 50px;
+    width: fit-content;
 }
+
 .pill-btn {
-    border:none;
-    padding:6px 16px;
-    border-radius:20px;
-    cursor:pointer;
-    font-size:14px;
-    font-weight:450;
+    color: white;
+    padding: 5px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.18);
     background: rgba(255,255,255,0.12);
-    color:white;
-    transition: all 0.2s ease;
 }
+
 .pill-btn.active {
-    background: rgba(255,255,255,0.25);
-    transform: translateY(-0.5px);
+    background: rgba(255,255,255,0.32);
+    transform: translateY(-1px);
+}
+
+/* =======================================================
+   ADD HABIT BAR
+======================================================= */
+
+#bottom-bar {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    right: 30px;
+
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 50px;
+
+    background: rgba(20,20,20,0.4);
+    backdrop-filter: blur(10px);
+}
+
+#new-habit-input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 50px;
+    border: none;
+    color: white;
+    background: rgba(255,255,255,0.14);
+}
+
+.add-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    font-size: 24px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =======================================================
+   MODAL
+======================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-inner {
+    padding: 20px;
+    width: 80%;
+    max-width: 360px;
+    border-radius: 18px;
+}
+
+.modal input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 14px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255,255,255,0.14);
+    color: white;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.danger {
+    background: rgba(255,40,40,0.3);
+    border: 1px solid rgba(255,80,80,0.4);
+}
+
+/* =======================================================
+   HIDDEN CLASS
+======================================================= */
+
+.hidden {
+    display: none !important;
 }
