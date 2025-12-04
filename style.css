@@ -176,13 +176,16 @@ HABIT CARDS
 }
 
 .action {
-    padding: 6px 12px;
-    border-radius: 50px;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    border-radius: 50%;
     cursor: pointer;
-    border: none;
     color: white;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.18);
+    font-size: 18px;
+    padding: 0; 
 }
 
 .action.toggle {
