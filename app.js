@@ -421,6 +421,7 @@ function createMonthGrid(centerDate) {
     cell.style.minHeight = "48px";
     cell.style.borderRadius = "8px";
     cell.style.fontSize = "13px";
+    cell.style.fontWeight = "700";
     cell.style.color = "white";
     cell.style.cursor = "default";
     cell.style.border = `1px solid rgba(255,255,255,0.06)`;
