@@ -1,25 +1,23 @@
 /* =======================================================
-   UNIVERSAL GLASS SYSTEM
-   All components inherit from .glass
-   Adjust per-element using CSS variables:
-   --frost: opacity of frosted layer (0–1)
-   --blur: blur strength
+UNIVERSAL GLASS SYSTEM
+All components inherit from .glass
+Adjust per-element using CSS variables:
+--frost: opacity of frosted layer (0–1)
+--blur: blur strength
 ======================================================= */
 
 .glass {
-    --frost: 0.25;        /* default transparency */
-    --blur: 16px;         /* default blur */
+    --blur: 2px;         /* default blur */
     --border: rgba(255,255,255,0.22);
 
     background: rgba(255, 255, 255, var(--frost));
     backdrop-filter: blur(var(--blur));
-    -webkit-backdrop-filter: blur(var(--blur));
     border: 1px solid var(--border);
     border-radius: 14px;
 }
 
 /* =======================================================
-   BASE RESET / LAYOUT
+BASE RESET / LAYOUT
 ======================================================= */
 
 * {
@@ -55,7 +53,7 @@ body {
 }
 
 /* =======================================================
-   DATE BAR / NAVIGATION
+DATE BAR / NAVIGATION
 ======================================================= */
 
 #date-bar {
@@ -69,10 +67,12 @@ body {
 }
 
 .nav-btn {
-    padding: 8px 12px;
-    border-radius: 10px;
+    color: white;
+    padding: 8px 11px;
+    border-radius: 50px;
     font-size: 20px;
     cursor: pointer;
+    background : rgba(20,20,20,0.35);
 }
 
 /* Center: date text + stats mode buttons */
@@ -92,7 +92,7 @@ body {
     border-radius: 50px;
 
     background: rgba(20,20,20,0.4);
-    border: 1px solid rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.2);
     backdrop-filter: blur(10px);
 
     margin: 0 auto; /* centers the whole container */
@@ -120,7 +120,7 @@ body {
 }
 
 /* =======================================================
-   HABIT CARDS
+HABIT CARDS
 ======================================================= */
 
 .habit {
@@ -128,15 +128,41 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 14px 16px;
-    margin: 10px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(20,20,20,0.4);
+    backdrop-filter: blur(2px);
 }
 
+/* completed style */
 .habit.done {
-    opacity: 0.65;
+    position: relative;
+    opacity: 0.6;
+    overflow: hidden;
 }
+
+/*
+.habit.done::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80%;
+    left: -100%;
+    border-radius: inherit;
+
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0) 40%,
+        rgba(255,255,255,0.25) 50%,
+        rgba(255,255,255,0) 60%
+    );
+
+    animation: glare-sweep 800ms ease forwards;
+}
+
+@keyframes glare-sweep {
+    from { transform: translateX(0); }
+    to   { transform: translateX(250%); }
+}*/
 
 .habit-name.done {
     text-decoration: line-through;
@@ -149,11 +175,13 @@ body {
 }
 
 .action {
-    padding: 6px 10px;
-    border-radius: 10px;
+    padding: 6px 8px;
+    border-radius: 50px;
     cursor: pointer;
     border: none;
+    color: white;
     background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
 }
 
 .action.toggle {
@@ -161,13 +189,15 @@ body {
 }
 
 /* =======================================================
-   PANELS (Stats)
+PANELS (Stats)
 ======================================================= */
 
 .panel {
     padding: 14px;
     border-radius: 14px;
     margin: 10px;
+    background: rgba(20,20,20,0.4);
+    backdrop-filter: blur(2px);
 }
 
 .panel-title {
@@ -177,7 +207,7 @@ body {
 }
 
 /* =======================================================
-   VIEW SWITCHER (Bottom Pills)
+VIEW SWITCHER (Bottom Pills)
 ======================================================= */
 
 #view-switcher {
@@ -187,7 +217,7 @@ body {
     transform: translateX(-50%);
 
     background: rgba(20,20,20,0.4);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(2px);
 
     display: flex;
     gap: 10px;
@@ -211,7 +241,7 @@ body {
 }
 
 /* =======================================================
-   ADD HABIT BAR
+ADD HABIT BAR
 ======================================================= */
 
 #bottom-bar {
@@ -222,11 +252,11 @@ body {
 
     display: flex;
     gap: 10px;
-    padding: 8px;
+    padding: 6px;
     border-radius: 50px;
 
     background: rgba(20,20,20,0.4);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(2px);
 }
 
 #new-habit-input {
@@ -236,6 +266,7 @@ body {
     border: none;
     color: white;
     background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .add-btn {
@@ -247,17 +278,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 /* =======================================================
-   MODAL
+MODAL
 ======================================================= */
 
 .modal {
     position: fixed;
     inset: 0;
-    backdrop-filter: blur(8px);
-    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    background: rgba(20,20,20,0.4);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -272,6 +304,7 @@ body {
     width: 80%;
     max-width: 360px;
     border-radius: 18px;
+    background: rgba(20,20,20, 0);
 }
 
 .modal input {
@@ -281,30 +314,46 @@ body {
     border-radius: 12px;
     border: none;
     background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.2);
     color: white;
 }
 
 .modal-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: right;
     gap: 8px;
 }
 
 .action-btn {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    border-radius: 50px;
+    color: white;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 17px;
     cursor: pointer;
 }
 
 .danger {
+    width: 60px;
+    height: 40px;
+    border-radius: 50px;
+    padding: 9px;
+    color: white;
+    cursor: pointer;
     background: rgba(255,40,40,0.3);
     border: 1px solid rgba(255,80,80,0.4);
 }
 
+.danger:hover {
+    background: rgba(244, 80, 80, 1);
+}
+
+
 /* =======================================================
-   HIDDEN CLASS
+HIDDEN CLASS
 ======================================================= */
 
 .hidden {

@@ -41,8 +41,8 @@ function formatDateLong(d) {
 
 function isSameDay(a, b) {
   return a.getFullYear() === b.getFullYear() &&
-         a.getMonth() === b.getMonth() &&
-         a.getDate() === b.getDate();
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate();
 }
 
 function canGoForward() {
@@ -89,7 +89,7 @@ function renderHabits() {
 
   if (habits.length === 0) {
     const hint = document.createElement("div");
-    hint.className = "glass-panel";
+    hint.className = "panel glass";
     hint.style.color = "white";
     hint.textContent = "No habits yet — why dont we add one!";
     list.appendChild(hint);
@@ -99,7 +99,7 @@ function renderHabits() {
   habits.forEach(h => {
     const done = !!(tracking[dKey] && tracking[dKey][h.id]);
     const card = document.createElement("div");
-    card.className = "habit" + (done ? " done" : "");
+    card.className = "habit panel glass" + (done ? " done" : "");
 
     const left = document.createElement("div");
     left.className = "left";
@@ -124,10 +124,12 @@ function renderHabits() {
     toggleBtn.addEventListener("click", async () => {
       await toggleComplete(h.id, viewingDate);
       card.classList.add("done");
-      setTimeout(() => { saveData(); render(); }, 140);
+      setTimeout(() => { 
+        saveData(); render(); 
+      }, 140);
     });
 
-     const moreBtn = document.createElement("button");
+    const moreBtn = document.createElement("button");
     moreBtn.className = "action";
     moreBtn.title = "More";
     moreBtn.textContent = "⋯";
@@ -179,7 +181,7 @@ btnHabits.addEventListener("click", () => switchView("habits"));
 btnStats.addEventListener("click", () => switchView("stats"));
 
 function switchView(view) {
-  const modeContainer = document.getElementById("view-mode");
+  const modeContainer = document.getElementById("mode-switcher");
   if(view==="habits"){
     habitsPage.classList.remove("hidden");
     statsPage.classList.add("hidden");
@@ -264,11 +266,20 @@ function createWeekGrid(centerDate) {
   wrapper.style.display = "flex";
   wrapper.style.gap = "6px";
 
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Find Monday
   const start = new Date(centerDate);
-  start.setDate(start.getDate() - 3);
+  const day = start.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  start.setDate(start.getDate() + diff);
+
   for (let i = 0; i < 7; i++) {
     const d = new Date(start);
+    d.setHours(0,0,0,0);
     d.setDate(start.getDate() + i);
+
     const k = dateKey(d);
     const doneCount = tracking[k] ? Object.values(tracking[k]).filter(Boolean).length : 0;
     const total = habits.length || 1;
@@ -277,7 +288,7 @@ function createWeekGrid(centerDate) {
     const cell = document.createElement("div");
     cell.style.width = "44px";
     cell.style.height = "44px";
-    cell.style.borderRadius = "8px";
+    cell.style.borderRadius = "10px";
     cell.style.display = "flex";
     cell.style.flexDirection = "column";
     cell.style.alignItems = "center";
@@ -285,11 +296,48 @@ function createWeekGrid(centerDate) {
     cell.style.fontSize = "12px";
     cell.style.fontWeight = "700";
     cell.style.color = "white";
-    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    cell.style.border = `1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML = `<div style="font-weight:600">${d.toLocaleDateString('en-GB',{weekday:'short'})}</div><div style="font-size:11px;margin-top:4px">${pct}%</div>`;
+    cell.style.cursor = "default";
+    cell.style.border = `1px solid rgba(255,255,255,0.08)`;
+    cell.style.transition = "0.25s ease";
+
+    // --- CHECK IF THIS IS THE SELECTED DAY ---
+    const isSelected =
+      d.getFullYear() === centerDate.getFullYear() &&
+      d.getMonth() === centerDate.getMonth() &&
+      d.getDate() === centerDate.getDate();
+
+    // --- CHECK IF THIS DATE IS IN THE FUTURE ---
+    const isFuture = d > today;
+
+    if (isSelected) {
+      // Highlight effect
+      cell.style.background = `rgba(255, 255, 255, 0.25)`;
+      cell.style.boxShadow = `0 0 12px rgba(255, 255, 255, 0.45) inset`;
+      cell.style.border = `1px solid rgba(255, 255, 255, 0.5)`;
+      cell.style.scale = "1.08";
+    } 
+    else if (isFuture) {
+      // FUTURE DAYS (greyed out)
+      cell.style.opacity = "0.45";
+      cell.style.color = "rgba(255,255,255,0.4)";
+      cell.style.background = `rgba(255,255,255,0.04)`;
+      cell.style.border = `1px solid rgba(255,255,255,0.04)`;
+      cell.style.filter = "grayscale(100%)";
+      cell.style.pointerEvents = "none";   // disables clicking
+    }
+    else {
+      // Normal days
+      cell.style.background =
+        `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
+    }
+
+    cell.innerHTML =
+      `<div style="font-weight:600">${d.toLocaleDateString("en-GB",{ weekday:"short" })}</div>
+      <div style="font-size:11px;margin-top:4px">${pct}%</div>`;
+
     wrapper.appendChild(cell);
   }
+
   return wrapper;
 }
 
@@ -299,19 +347,39 @@ function createMonthGrid(centerDate) {
   wrapper.style.gridTemplateColumns = "repeat(7, 1fr)";
   wrapper.style.gap = "6px";
 
+  /* --- WEEKDAY HEADER ROW --- */
+  const weekdayInitials = ["S", "M", "T", "W", "T", "F", "S"];
+  weekdayInitials.forEach(letter => {
+    const head = document.createElement("div");
+    head.textContent = letter;
+    head.style.textAlign = "center";
+    head.style.fontWeight = "700";
+    head.style.fontSize = "14px";
+    head.style.color = "white";
+    head.style.opacity = "0.75";
+    head.style.marginBottom = "4px";
+    wrapper.appendChild(head);
+  });
+
+  /* --- MONTH GRID CELLS --- */
   const first = new Date(centerDate.getFullYear(), centerDate.getMonth(), 1);
   const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth() + 1, 0).getDate();
+
+  // getDay() still works — but we offset because there’s now a header row
   const startDay = first.getDay();
 
+  // Add blank boxes before day 1
   for (let i = 0; i < startDay; i++) {
     const blank = document.createElement("div");
     blank.style.height = "48px";
     wrapper.appendChild(blank);
   }
 
+  // Add each day cell
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(centerDate.getFullYear(), centerDate.getMonth(), d);
     const key = dateKey(date);
+
     const doneCount = tracking[key] ? Object.values(tracking[key]).filter(Boolean).length : 0;
     const total = habits.length || 1;
     const pct = Math.round((doneCount / total) * 100);
@@ -324,11 +392,20 @@ function createMonthGrid(centerDate) {
     cell.style.justifyContent = "center";
     cell.style.fontSize = "13px";
     cell.style.color = "white";
+    cell.style.cursor = "default";
     cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
     cell.style.border = `1px solid rgba(255,255,255,0.06)`;
-    cell.innerHTML = `<div style="text-align:center"><div style="font-weight:700">${d}</div><div style="font-size:11px;margin-top:6px">${pct}%</div></div>`;
+
+    cell.innerHTML = `
+      <div style="text-align:center">
+        <div style="font-weight:700">${d}</div>
+        <div style="font-size:11px;margin-top:6px">${pct}%</div>
+      </div>
+    `;
+
     wrapper.appendChild(cell);
   }
+
   return wrapper;
 }
 
