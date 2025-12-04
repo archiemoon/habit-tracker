@@ -20,6 +20,35 @@ function uid() {
   return Math.random().toString(36).slice(2, 9);
 }
 
+/* ----------------- PROGRESS ---------------- */
+const overviewContainer = document.getElementById("overview-content");
+
+// Create progress bar container
+const progressContainer = document.createElement("div");
+progressContainer.id = "overview-progress-bar";
+
+const progressBar = document.createElement("div");
+progressBar.id = "daily-progress-bar";
+
+progressContainer.appendChild(progressBar);
+overviewContainer.prepend(progressContainer);
+
+function updateDailyProgress() {
+  const progressBar = document.getElementById("daily-progress-bar");
+  if (!progressBar) return;
+
+  const todayKey = dateKey(viewingDate);
+  ensureDateKey(todayKey);
+
+  const doneCount = habits.filter(h => tracking[todayKey] && tracking[todayKey][h.id]).length;
+  const total = habits.length || 1;
+  const pct = Math.round((doneCount / total) * 100);
+
+  progressBar.style.width = pct + "%";
+
+  return pct;
+}
+
 /* ---------------- DATE ---------------- */
 let viewingDate = new Date();
 const today = new Date();
@@ -124,6 +153,9 @@ function renderHabits() {
     toggleBtn.addEventListener("click", async () => {
       await toggleComplete(h.id, viewingDate);
       card.classList.add("done");
+
+      updateDailyProgress();
+
       setTimeout(() => { 
         saveData(); render(); 
       }, 140);
@@ -181,6 +213,12 @@ btnHabits.addEventListener("click", () => switchView("habits"));
 btnStats.addEventListener("click", () => switchView("stats"));
 
 function switchView(view) {
+
+  if (confettiTimeout) {
+    clearTimeout(confettiTimeout);
+    tsParticles.dom().forEach(instance => instance.destroy());
+  }
+
   const modeContainer = document.getElementById("mode-switcher");
   if(view==="habits"){
     habitsPage.classList.remove("hidden");
@@ -197,6 +235,7 @@ function switchView(view) {
     renderStreaks();
     renderOverview();
   }
+
 }
 
 /* ---------------- MODAL ---------------- */
@@ -235,11 +274,19 @@ function getStreaks() {
 
 function renderStreaks() {
   const el = document.getElementById("streaks-list");
-  el.innerHTML="";
+  el.innerHTML = "";
+
   const streaks = getStreaks();
-  streaks.forEach(s=>{
+
+  streaks.forEach(s => {
     const div = document.createElement("div");
-    div.textContent = `${s.name}: ${s.streak} day${s.streak!==1?"s":""}`;
+    div.className = "streak-item";
+
+    div.innerHTML = `
+      <div class="streak-name">${s.name}</div>
+      <div class="streak-count">${s.streak} day${s.streak !== 1 ? "s" : ""}</div>
+    `;
+
     el.appendChild(div);
   });
 }
@@ -286,6 +333,7 @@ function createWeekGrid(centerDate) {
     const pct = Math.round((doneCount / total) * 100);
 
     const cell = document.createElement("div");
+    cell.style.position = "relative";
     cell.style.width = "44px";
     cell.style.height = "44px";
     cell.style.borderRadius = "10px";
@@ -298,42 +346,30 @@ function createWeekGrid(centerDate) {
     cell.style.color = "white";
     cell.style.cursor = "default";
     cell.style.border = `1px solid rgba(255,255,255,0.08)`;
-    cell.style.transition = "0.25s ease";
+    cell.style.overflow = "hidden";
 
-    // --- CHECK IF THIS IS THE SELECTED DAY ---
-    const isSelected =
-      d.getFullYear() === centerDate.getFullYear() &&
-      d.getMonth() === centerDate.getMonth() &&
-      d.getDate() === centerDate.getDate();
+    // --- Progress fill ---
+    const fill = document.createElement("div");
+    fill.style.position = "absolute";
+    fill.style.bottom = "0";
+    fill.style.left = "0";
+    fill.style.right = "0";
+    fill.style.height = pct + "%";
+    // Gradient from light to deep blue
+    fill.style.background = "linear-gradient(to top,  #00bfff, #1e90ff)";
+    fill.style.zIndex = "0";
+    cell.appendChild(fill);
 
-    // --- CHECK IF THIS DATE IS IN THE FUTURE ---
-    const isFuture = d > today;
-
-    if (isSelected) {
-      // Highlight effect
-      cell.style.background = `rgba(255, 255, 255, 0.25)`;
-      cell.style.boxShadow = `0 0 12px rgba(255, 255, 255, 0.45) inset`;
-      cell.style.border = `1px solid rgba(255, 255, 255, 0.5)`;
-      cell.style.scale = "1.08";
-    } 
-    else if (isFuture) {
-      // FUTURE DAYS (greyed out)
-      cell.style.opacity = "0.45";
-      cell.style.color = "rgba(255,255,255,0.4)";
-      cell.style.background = `rgba(255,255,255,0.04)`;
-      cell.style.border = `1px solid rgba(255,255,255,0.04)`;
-      cell.style.filter = "grayscale(100%)";
-      cell.style.pointerEvents = "none";   // disables clicking
-    }
-    else {
-      // Normal days
-      cell.style.background =
-        `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
-    }
-
-    cell.innerHTML =
-      `<div style="font-weight:600">${d.toLocaleDateString("en-GB",{ weekday:"short" })}</div>
-      <div style="font-size:11px;margin-top:4px">${pct}%</div>`;
+    // --- Cell content on top ---
+    const content = document.createElement("div");
+    content.style.position = "relative";
+    content.style.zIndex = "1";
+    content.style.textAlign = "center";
+    content.innerHTML = `
+      <div style="font-weight:600">${d.toLocaleDateString("en-GB",{ weekday:"short" })}</div>
+      <div style="font-size:11px;margin-top:4px">${pct}%</div>
+    `;
+    cell.appendChild(content);
 
     wrapper.appendChild(cell);
   }
@@ -347,7 +383,7 @@ function createMonthGrid(centerDate) {
   wrapper.style.gridTemplateColumns = "repeat(7, 1fr)";
   wrapper.style.gap = "6px";
 
-  /* --- WEEKDAY HEADER ROW --- */
+  // Weekday header
   const weekdayInitials = ["S", "M", "T", "W", "T", "F", "S"];
   weekdayInitials.forEach(letter => {
     const head = document.createElement("div");
@@ -361,21 +397,17 @@ function createMonthGrid(centerDate) {
     wrapper.appendChild(head);
   });
 
-  /* --- MONTH GRID CELLS --- */
   const first = new Date(centerDate.getFullYear(), centerDate.getMonth(), 1);
   const daysInMonth = new Date(centerDate.getFullYear(), centerDate.getMonth() + 1, 0).getDate();
-
-  // getDay() still works — but we offset because there’s now a header row
   const startDay = first.getDay();
 
-  // Add blank boxes before day 1
+  // Blank boxes
   for (let i = 0; i < startDay; i++) {
     const blank = document.createElement("div");
     blank.style.height = "48px";
     wrapper.appendChild(blank);
   }
 
-  // Add each day cell
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(centerDate.getFullYear(), centerDate.getMonth(), d);
     const key = dateKey(date);
@@ -385,23 +417,37 @@ function createMonthGrid(centerDate) {
     const pct = Math.round((doneCount / total) * 100);
 
     const cell = document.createElement("div");
+    cell.style.position = "relative";
     cell.style.minHeight = "48px";
     cell.style.borderRadius = "8px";
-    cell.style.display = "flex";
-    cell.style.alignItems = "center";
-    cell.style.justifyContent = "center";
     cell.style.fontSize = "13px";
     cell.style.color = "white";
     cell.style.cursor = "default";
-    cell.style.background = `linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))`;
     cell.style.border = `1px solid rgba(255,255,255,0.06)`;
+    cell.style.overflow = "hidden";
 
-    cell.innerHTML = `
-      <div style="text-align:center">
-        <div style="font-weight:700">${d}</div>
-        <div style="font-size:11px;margin-top:6px">${pct}%</div>
-      </div>
+    // --- Progress fill ---
+    const fill = document.createElement("div");
+    fill.style.position = "absolute";
+    fill.style.bottom = "0";
+    fill.style.left = "0";
+    fill.style.right = "0";
+    fill.style.height = pct + "%";
+    // Gradient from light to deep blue
+    fill.style.background = "linear-gradient(to top,  #00bfff, #1e90ff)";
+    fill.style.zIndex = "0";
+    cell.appendChild(fill);
+
+    // Content
+    const content = document.createElement("div");
+    content.style.position = "relative";
+    content.style.zIndex = "1";
+    content.style.textAlign = "center";
+    content.innerHTML = `
+      <div style="font-weight:700">${d}</div>
+      <div style="font-size:11px;margin-top:6px">${pct}%</div>
     `;
+    cell.appendChild(content);
 
     wrapper.appendChild(cell);
   }
@@ -409,26 +455,120 @@ function createMonthGrid(centerDate) {
   return wrapper;
 }
 
+/* ---------------- CONFETTIIIII!!! ---------------- */
+let confettiTimeout;
+
 function renderOverview() {
   const container = document.getElementById("overview-content");
   container.innerHTML = "";
 
   if (statsPeriod === "daily") {
-    container.textContent = `${habits.length} habits`;
+    const countText = document.createElement("div");
+    countText.textContent = `${habits.length} habit${habits.length !== 1 ? "s" : ""}`;
+    container.appendChild(countText);
+
+    let progressContainer = document.getElementById("overview-progress-bar");
+    if (!progressContainer) {
+      progressContainer = document.createElement("div");
+      progressContainer.id = "overview-progress-bar";
+
+      const progressBar = document.createElement("div");
+      progressBar.id = "daily-progress-bar";
+
+      progressContainer.appendChild(progressBar);
+      container.appendChild(progressContainer);
+    } else {
+      container.appendChild(progressContainer);
+    }
+
+    const pct = updateDailyProgress();
+
+    // Trigger confetti when daily progress reaches 100%
+    if (pct >= 100) triggerConfetti();
+
     return;
   }
 
-  if (statsPeriod === "weekly") {
-    container.appendChild(createWeekGrid(viewingDate));
-    return;
-  }
-
-  if (statsPeriod === "monthly") {
-    container.appendChild(createMonthGrid(viewingDate));
-    return;
-  }
+  if (statsPeriod === "weekly") container.appendChild(createWeekGrid(viewingDate));
+  if (statsPeriod === "monthly") container.appendChild(createMonthGrid(viewingDate));
 }
 
+function triggerConfetti(duration = 2000, count = 6) {
+  const startTime = Date.now();
+
+  function launchExplosion() {
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * (window.innerHeight * 0.6); // upper 60% of screen
+    triggerConfettiExplosion(x, y);
+  }
+
+  // Launch explosions at random intervals
+  const interval = setInterval(() => {
+    if (Date.now() - startTime > duration) {
+      clearInterval(interval);
+      return;
+    }
+    launchExplosion();
+  }, duration / count); // divide total duration by number of explosions
+}
+
+function triggerConfettiExplosion(x, y) {
+  // Create a canvas for this explosion
+  const canvas = document.createElement("canvas");
+  canvas.style.position = "fixed";
+  canvas.style.left = 0;
+  canvas.style.top = 0;
+  canvas.style.pointerEvents = "none";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  const particles = [];
+  const colors = ["#FF0000", "#FFFF00", "#00FF00", "#00FFFF", "#FF00FF", "#FFA500"];
+  const particleCount = 50 + Math.floor(Math.random() * 30);
+
+  // Initialize particles
+  for (let i = 0; i < particleCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 2 + Math.random() * 4;
+    particles.push({
+      x: x,
+      y: y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: 3 + Math.random() * 3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      decay: 0.01 + Math.random() * 0.02
+    });
+  }
+
+  // Animate particles
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05; // gravity
+      p.alpha -= p.decay;
+      if (p.alpha > 0) alive = true;
+
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    if (alive) requestAnimationFrame(animate);
+    else canvas.remove();
+  }
+
+  animate();
+}
 /* ---------------- ADD HABIT ---------------- */
 document.getElementById("add-button").onclick = () => {
   const input = document.getElementById("new-habit-input");

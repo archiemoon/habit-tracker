@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>Habit Tracker</title>
 
-<link rel="stylesheet" href="style.css?v=3.3">
+<link rel="stylesheet" href="style.css?v=4.0-">
 
 </head>
 <body>
@@ -14,6 +14,7 @@
 
     <!-- Main App -->
     <div id="app" role="application" aria-label="Habit Tracker App">
+        <div id="confetti"></div>
         <!-- Header / Date Bar -->
         <div id="date-bar">
             <div class="left-controls">
@@ -72,8 +73,8 @@
                 <h3>Edit habit</h3>
                 <input id="edit-name" class="glass" type="text" maxlength="80" />
                 <div class="modal-actions">
+                    <button id="cancel-edit" class="action-btn glass">␛</button>
                     <button id="save-edit" class="action-btn glass">✓</button>
-                    <button id="cancel-edit" class="action-btn glass">X</button>
                     <button id="delete-habit" class="danger glass">Delete</button>
                 </div>
             </div>
@@ -81,6 +82,6 @@
 
     </div>
 
-<script src="app.js?v=3.3"></script>
+<script src="app.js?v=4.0"></script>
 </body>
 </html>
