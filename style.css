@@ -35,11 +35,6 @@ html,body { height:100%; margin:0; padding:0; font-family: Inter, system-ui, -ap
     background-position: center;
     background-repeat: no-repeat;
 }
-canvas {
-    display: block;
-    width: 100vw !important;
-    height: 100vh !important;
-}
 
 /* Date bar */
 #date-bar {
@@ -173,16 +168,6 @@ canvas {
     max-width: 600px;
 }
 
-#new-habit-input {
-    flex:1;
-    padding:10px;
-    border-radius:20px;
-    border:none;
-    background: rgba(255,255,255,0.06);
-    color:white;
-    font-size:15px;
-}
-
 .add-btn {
     border:none;
     padding:2px 15px;
@@ -198,6 +183,24 @@ canvas {
     background: rgb(255, 255, 255, 0.35);
 }
 
+/* glass style for habit edit buttons */
+.glass {
+    background: rgba(255,255,255,0.12);
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.18);
+    padding:8px;
+}
+.action-btn {
+    width:40px;
+    height:40px;
+    display:grid;
+    color :white;
+    place-items:center;
+    font-size:20px;
+    border-radius:50%;
+    cursor:pointer;
+}
+
 /* add panel */
 .add-panel { 
     display:flex; 
@@ -209,7 +212,8 @@ canvas {
     flex:1; 
     padding:10px; 
     border-radius:10px; 
-    border:1px solid rgba(255,255,255,0.08); background:transparent; 
+    border:1px solid rgba(255,255,255,0.08); 
+    background:transparent; 
     color:white; 
     font-size:15px; 
     display:block; 
@@ -264,7 +268,7 @@ canvas {
     background: linear-gradient(180deg,var(--danger),#d94e4e); color:white; 
 }
 
-/* utility */
+/* utility page switcher */
 .hidden { 
     display:none; 
 }
@@ -281,7 +285,7 @@ canvas {
     border-radius:10px; 
 }
 
-/* responsive */
+/* responsive date select buttons */
 @media (max-width:720px) {
     #top-panels { flex-direction:column; }
     .left-controls, .right-controls { display:none; }
