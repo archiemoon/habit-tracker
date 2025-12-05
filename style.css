@@ -29,6 +29,7 @@ BASE RESET / LAYOUT
 
 body {
     overflow: hidden;
+    position: fixed;
     background: #000;
     color: white;
     padding-top: env(safe-area-inset-top);
