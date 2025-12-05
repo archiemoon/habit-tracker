@@ -29,7 +29,6 @@ BASE RESET / LAYOUT
 
 body {
     overflow: hidden;
-    position: fixed;
     background: #000;
     color: white;
 }
