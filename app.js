@@ -46,6 +46,12 @@ function updateDailyProgress() {
 
   progressBar.style.width = pct + "%";
 
+  if (pct >= 100) {
+    progressBar.classList.add("rainbow");
+  } else {
+    progressBar.classList.remove("rainbow");
+  }
+
   return pct;
 }
 
