@@ -32,8 +32,6 @@ body {
     position: fixed;
     background: #000;
     color: white;
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Background image or gradient */
