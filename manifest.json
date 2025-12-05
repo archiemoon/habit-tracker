@@ -1,14 +1,14 @@
 {
     "name": "Habit Tracker",
     "short_name": "Habits",
-    "start_url": "/habit-tracker/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#000000",
     "theme_color": "#1e90ff",
     "icons": [
     {
         "src": "icon-192.png",
-        "sizes": "188x188",
+        "sizes": "192x192",
         "type": "image/png"
     }
     ]
