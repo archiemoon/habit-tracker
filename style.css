@@ -29,10 +29,11 @@ BASE RESET / LAYOUT
 
 body {
     height: 100%;
+    overflow: hidden;
+    background-color: black;
     color: white;
     background: url('project-background.jpeg') no-repeat center center fixed;
     background-size: cover;
-    /*background-attachment: scroll;*/
     padding-top: env(safe-area-inset-top);
 }
 
