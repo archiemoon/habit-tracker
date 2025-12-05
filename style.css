@@ -31,6 +31,7 @@ body {
     overflow: hidden;
     background: #000;
     color: white;
+    padding-top: env(safe-area-inset-top);
 }
 
 /* Background image or gradient */
