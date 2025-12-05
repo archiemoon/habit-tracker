@@ -28,12 +28,10 @@ BASE RESET / LAYOUT
 }
 
 body {
-    height: 100%;
     overflow: hidden;
-    background-color: black;
+    position: fixed;
+    background: #000;
     color: white;
-    background: url('project-background.jpeg') no-repeat center center fixed;
-    background-size: cover;
 }
 
 /* Background image or gradient */
