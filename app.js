@@ -507,6 +507,7 @@ function renderOverview() {
     // Trigger confetti when daily progress reaches 100%
     if (pct >= 100) triggerConfetti();
 
+
     return;
   }
 
