@@ -192,6 +192,16 @@ function addHabit(name) {
   render();
 }
 
+function updateHabit(id, newName) {
+  const trimmedName = newName.trim();
+  if (!trimmedName) return; // Do nothing if empty
+  const habit = habits.find(h => h.id === id);
+  if (!habit) return;
+  habit.name = trimmedName;
+  saveData();
+  render();
+}
+
 function deleteHabit(id) {
   habits = habits.filter(h=>h.id!==id);
   for (let day in tracking) delete tracking[day][id];
@@ -216,26 +226,30 @@ function switchView(view) {
 
   if (confettiTimeout) {
     clearTimeout(confettiTimeout);
-    tsParticles.dom().forEach(instance => instance.destroy());
+    explosions.forEach(exp => clearTimeout(exp));
+    explosions = [];
   }
 
   const modeContainer = document.getElementById("mode-switcher");
-  if(view==="habits"){
+
+  if(view === "habits"){
     habitsPage.classList.remove("hidden");
     statsPage.classList.add("hidden");
     btnHabits.classList.add("active");
     btnStats.classList.remove("active");
     modeContainer.style.display = "none";
+
+    renderHabits(); // <-- make sure habits update
   } else {
     habitsPage.classList.add("hidden");
     statsPage.classList.remove("hidden");
     btnHabits.classList.remove("active");
     btnStats.classList.add("active");
     modeContainer.style.display = "flex";
+
     renderStreaks();
     renderOverview();
   }
-
 }
 
 /* ---------------- MODAL ---------------- */
